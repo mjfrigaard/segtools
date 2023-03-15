@@ -4,7 +4,7 @@
 \alias{seg_risk_vars}
 \title{SEG risk vars}
 \usage{
-seg_risk_vars(data, is_path, app_data)
+seg_risk_vars(data, is_path)
 }
 \arguments{
 \item{data}{Dataset containing only `BGM` and `REF` columns}

@@ -11,10 +11,9 @@
 #'    system.file("extdata", "VanderbiltComplete.csv",
 #'                package = "segtools"),
 #'             is_path = TRUE)
-seg_risk_vars <- function(data, is_path, app_data) {
+seg_risk_vars <- function(data, is_path) {
 
-  risk_cats_tbl <- seg_risk_cats(data,
-    is_path = is_path)
+  risk_cats_tbl <- seg_risk_cats(data, is_path = is_path)
 
   seg_risk_tbl <- dplyr::mutate(risk_cats_tbl,
     risk_cat_txt = # text risk categories

@@ -1,6 +1,8 @@
 ---
 title: "segtools"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    df_print: kable
 vignette: >
   %\VignetteIndexEntry{segtools}
   %\VignetteEngine{knitr::rmarkdown}
@@ -78,9 +80,7 @@ The summary tables rely on separate functions for each table.
 1. `seg_pairs_table()` returns the pairs comparing `BGM` to `REF`
 
 ```{r}
-knitr::kable(
 seg_pairs_table(data = test_data, is_path = FALSE)
-)
 ```
 
 
@@ -89,16 +89,14 @@ seg_pairs_table(data = test_data, is_path = FALSE)
   - `seg_risk_vars()` to calculate the intermediate risk variables  
     
 ```{r}
-seg_risk_vars(data = test_data, is_path = FALSE, app_data = FALSE) |> glimpse()
+seg_risk_vars(data = test_data, is_path = FALSE) |> glimpse()
 ```
 
   
   - `seg_mard_table()` to calculate the Bias, MARD, CV, and lower/upper 95% CI 
     
-```{r seg_mard_table, eval=FALSE}
-knitr::kable(
-seg_mard_table(data = test_data, is_path = FALSE, app_data)
-)
+```{r seg_mard_table}
+seg_mard_table(data = test_data, is_path = FALSE)
 ```
     
 3. `seg_risk_grade_table()` returns a table of risk grades 
@@ -137,7 +135,7 @@ seg_binom_table(data = test_data, is_path = FALSE)
 
 ## Graphs 
 
-segtools can also create the following graphs:
+`segtools` can also create the following graphs:
 
 ### The SEG grid
 

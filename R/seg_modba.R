@@ -13,7 +13,9 @@
 #'    system.file("extdata", "VanderbiltComplete.csv",
 #'                package = "segtools"), delim = ",")
 #' seg_modba(data = vanderbilt_complete, is_path = FALSE)
+
 seg_modba <- function(data, is_path) {
+
   risk_tbl <- seg_risk_vars(data = data, is_path = is_path)
 
       # calculate LN of REF and BGM -----
@@ -49,7 +51,7 @@ seg_modba <- function(data, is_path) {
 
       ggplot2::geom_line(aes(x = Ref, y = UB),
 
-        data = segtools::seg_bland_altman_ref_vals,
+        data = segtools::APPSEGBlandAltmanRefVals,
 
         linetype = "1111",
 
@@ -61,7 +63,7 @@ seg_modba <- function(data, is_path) {
 
       ggplot2::geom_line(aes(x = Ref, y = LB),
 
-        data = segtools::seg_bland_altman_ref_vals,
+        data = segtools::APPSEGBlandAltmanRefVals,
 
         linetype = "1111",
 
