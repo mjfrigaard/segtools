@@ -1,0 +1,9 @@
+Package: segapp
+Title: The surveillance error grid tools
+Version: 0.0.0.9000
+Authors@R: person('Martin', 'Frigaard', email = 'mjfrigaard@pm.me', role = c('cre', 'aut'))
+License: MIT + file LICENSE
+Maintainer: Martin Frigaard <mjfrigaard@pm.me>
+Description: The segapp package incorporates 1) the use of a surveillance error grid to evaluate blood glucose measurements, and 2) the accuracy of marketed blood glucose monitors.
+Encoding: UTF-8
+LazyData: true

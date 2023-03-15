@@ -1,0 +1,9 @@
+RiskCat,ABSLB,ABSUB,RiskCatRangeTxt,RiskCatLabel
+0,-0.001,0.5,0.0 - 0.5,None
+1,0.5,1,>0.5 - 1.0,"Slight, Lower"
+2,1,1.5,>1.0 - 1.5,"Slight, Higher"
+3,1.5,2,>1.5 - 2.0,"Moderate, Lower"
+4,2,2.5,>2.0 - 2.5,"Moderate, Higher"
+5,2.5,3,>2.5 - 3.0,"Great, Lower"
+6,3,3.5,>3.0 - 3.5,"Great, Higher"
+7,3.5,10,3.5,Extreme
