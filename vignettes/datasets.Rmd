@@ -1,0 +1,68 @@
+---
+title: "Lookup datasets"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Lookup datasets}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(segtools)
+```
+
+`AppLookUpRiskCat` vs. `LookUpRiskCat`
+
+```{r}
+waldo::compare(
+  names(segtools::AppLookUpRiskCat),
+  names(segtools::LookUpRiskCat)
+)
+
+waldo::compare(
+  segtools::AppLookUpRiskCat$risk_cat,
+  segtools::LookUpRiskCat$risk_cat
+)
+waldo::compare(
+  segtools::AppLookUpRiskCat$ABSLB,
+  segtools::LookUpRiskCat$ABSLB
+)
+
+waldo::compare(
+  segtools::AppLookUpRiskCat$ABSUB,
+  segtools::LookUpRiskCat$ABSUB
+)
+```
+
+## `AppRiskPairData` vs `RiskPairData`
+
+```{r}
+waldo::compare(
+  names(segtools::AppRiskPairData),
+  names(segtools::RiskPairData)
+)
+
+waldo::compare(
+  segtools::AppRiskPairData$REF,
+  segtools::RiskPairData$REF
+)
+waldo::compare(
+  segtools::AppRiskPairData$BGM,
+  segtools::RiskPairData$BGM
+)
+
+waldo::compare(
+  segtools::AppRiskPairData$RiskFactor,
+  segtools::RiskPairData$RiskFactor
+)
+```
+
+
+

@@ -12,9 +12,16 @@ Imports:
     extrafont,
     ggplot2,
     janitor,
+    png,
     purrr,
     showtext,
     sysfonts,
     tibble,
     vroom,
     waldo
+Depends: 
+    R (>= 2.10)
+Suggests: 
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

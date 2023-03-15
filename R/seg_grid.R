@@ -185,7 +185,7 @@ seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
           4.0 # brown
         )),
         limits = c(0, 4),
-        colors = segtools::riskfactor_colors,
+        colors = segtools::risk_factor_colors,
         guide = guide_colorbar(
           ticks = FALSE,
           barheight = unit(100, "mm")
