@@ -141,7 +141,7 @@ theme_seg <- function(base_size = 11, base_family = "Ubuntu",
 seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
 
   risk_tbl <- seg_risk_vars(data = data, is_path = is_path)
-  base_layer <- segapp::base_data |>
+  base_layer <- segtools::base_data |>
   ggplot(aes(
       x = x_coordinate,
       y = y_coordinate,
@@ -152,7 +152,7 @@ seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
     ggplot2::scale_y_continuous(
       limits = c(0, 600),
       sec.axis =
-        sec_axis(~. / segapp::mmolConvFactor,
+        sec_axis(~. / segtools::mmolConvFactor,
           name = "Measured blood glucose (mmol/L)"
         ),
       name = "Measured blood glucose (mg/dL)"
@@ -160,7 +160,7 @@ seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
     scale_x_continuous(
       limits = c(0, 600),
       sec.axis =
-        sec_axis(~. / segapp::mmolConvFactor,
+        sec_axis(~. / segtools::mmolConvFactor,
           name = "Reference blood glucose (mmol/L)"
         ),
       name = "Reference blood glucose (mg/dL)"
@@ -168,7 +168,7 @@ seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
 
   gaussian_layer <- scales_layer +
   ggplot2::annotation_custom(
-    grid::rasterGrob(image = segapp::seg_gaussian_array,
+    grid::rasterGrob(image = segtools::seg_gaussian_array,
                                width = unit(1,"npc"),
                                height = unit(1,"npc")),
                                xmin = 0,
@@ -185,7 +185,7 @@ seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
           4.0 # brown
         )),
         limits = c(0, 4),
-        colors = segapp::riskfactor_colors,
+        colors = segtools::riskfactor_colors,
         guide = guide_colorbar(
           ticks = FALSE,
           barheight = unit(100, "mm")

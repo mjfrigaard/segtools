@@ -14,7 +14,7 @@
 #' seg_pairs_table(
 #'  data =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"),
+#'                package = "segtools"),
 #' is_path = TRUE)
 #'
 seg_pairs_table <- function(data, is_path = FALSE) {
@@ -99,7 +99,7 @@ seg_pairs_table <- function(data, is_path = FALSE) {
 #' seg_risk_vars(
 #'  data =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"),
+#'                package = "segtools"),
 #' is_path = TRUE)
 #'
 seg_risk_vars <- function(data, is_path) {
@@ -134,10 +134,10 @@ seg_risk_vars <- function(data, is_path) {
         REF > 600 ~ "Total excluded in SEG Analysis"
       )
   )
-  # join to segapp::risk_pair_data ----
+  # join to segtools::risk_pair_data ----
   risk_pair_cat <- dplyr::inner_join(
     x = pair_cat,
-    y = segapp::risk_pair_data,
+    y = segtools::risk_pair_data,
     by = c("BGM", "REF")
   )
   abs_risk_tbl <- dplyr::mutate(risk_pair_cat,
@@ -147,15 +147,15 @@ seg_risk_vars <- function(data, is_path) {
         # the abs_risk absolute value
         x = abs_risk,
          # the lower bound absolute risk
-        vec = segapp::risk_cat_lookup$ABSLB,
+        vec = segtools::risk_cat_lookup$ABSLB,
         left.open = TRUE
       )
   )
-  #  Join to segapp::risk_cat_lookup data ----
+  #  Join to segtools::risk_cat_lookup data ----
   risk_cat_tbl <- dplyr::inner_join(
     x = abs_risk_tbl,
     # inner join to look-up
-    y = segapp::risk_cat_lookup,
+    y = segtools::risk_cat_lookup,
     by = "risk_cat"
   )
   # seg_risk_tbl ----
@@ -230,7 +230,7 @@ seg_risk_vars <- function(data, is_path) {
 #' seg_mard_table(
 #'  data =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"),
+#'                package = "segtools"),
 #' is_path = TRUE)
 seg_mard_table <- function(data, is_path = FALSE) {
   # create risk variables
@@ -309,7 +309,7 @@ seg_mard_table <- function(data, is_path = FALSE) {
 #' seg_risk_grade_table(
 #'  data =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"),
+#'                package = "segtools"),
 #' is_path = TRUE)
 seg_risk_grade_table <- function(data, is_path) {
   # create risk variables ----
@@ -321,10 +321,10 @@ seg_risk_grade_table <- function(data, is_path) {
   seg_risk_data |>
     # count risk grade ----
     dplyr::count(risk_grade, sort = TRUE) |>
-    # join to segapp::risk_level_lookup ----
+    # join to segtools::risk_level_lookup ----
     # previously lkpRiskGrade
     dplyr::full_join(
-      y = segapp::risk_grade_lookup,
+      y = segtools::risk_grade_lookup,
       by = "risk_grade"
     ) |>
     # clean names ----
@@ -374,7 +374,7 @@ seg_risk_grade_table <- function(data, is_path) {
 #' seg_risk_level_table(
 #'  data =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"),
+#'                package = "segtools"),
 #' is_path = TRUE)
 seg_risk_level_table <- function(data, is_path) {
   # create risk variables ----
@@ -393,7 +393,7 @@ seg_risk_level_table <- function(data, is_path) {
   # previously lkpSEGRiskCat4
   risk_cat_levels <- dplyr::full_join(
     x = risk_counts,
-    y = segapp::risk_level_lookup,
+    y = segtools::risk_level_lookup,
     by = "risk_cat"
   )
 
@@ -434,7 +434,7 @@ seg_risk_level_table <- function(data, is_path) {
 #' seg_iso_range_table(
 #'  data =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"),
+#'                package = "segtools"),
 #' is_path = TRUE)
 seg_iso_range_table <- function(data, is_path) {
 risk_tbl <- seg_risk_vars(data = data , is_path = is_path)
@@ -442,7 +442,7 @@ iso_range_cnts <- dplyr::count(risk_tbl,
                                 iso_range, sort = TRUE)
       iso_ranges <- dplyr::full_join(
         x = iso_range_cnts,
-        y = segapp::iso_range_lookup,
+        y = segtools::iso_range_lookup,
                 by = "iso_range")
 
       iso_perc <- dplyr::mutate(
@@ -474,7 +474,7 @@ iso_range_cnts <- dplyr::count(risk_tbl,
 #' seg_binom_table(
 #'  data =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"),
+#'                package = "segtools"),
 #' is_path = TRUE)
 seg_binom_table <- function(data, is_path) {
   risk_tbl <- seg_risk_vars(data = data, is_path = is_path)

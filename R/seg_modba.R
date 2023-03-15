@@ -11,7 +11,7 @@
 #' vanderbilt_complete <- vroom::vroom(
 #'  file =
 #'    system.file("extdata", "VanderbiltComplete.csv",
-#'                package = "segapp"), delim = ",")
+#'                package = "segtools"), delim = ",")
 #' seg_modba(data = vanderbilt_complete, is_path = FALSE)
 seg_modba <- function(data, is_path) {
   risk_tbl <- seg_risk_vars(data = data, is_path = is_path)
@@ -45,11 +45,11 @@ seg_modba <- function(data, is_path) {
 
       ) +
 
-      # use segapp::seg_bland_altman_ref_vals -----
+      # use segtools::seg_bland_altman_ref_vals -----
 
       ggplot2::geom_line(aes(x = Ref, y = UB),
 
-        data = segapp::seg_bland_altman_ref_vals,
+        data = segtools::seg_bland_altman_ref_vals,
 
         linetype = "1111",
 
@@ -61,7 +61,7 @@ seg_modba <- function(data, is_path) {
 
       ggplot2::geom_line(aes(x = Ref, y = LB),
 
-        data = segapp::seg_bland_altman_ref_vals,
+        data = segtools::seg_bland_altman_ref_vals,
 
         linetype = "1111",
 
@@ -71,5 +71,5 @@ seg_modba <- function(data, is_path) {
 
       ) +
 
-    segapp::theme_seg()
+    segtools::theme_seg()
 }
