@@ -2,7 +2,7 @@
 c("attachment", "cli", "config", "devtools",
   "dplyr", "datapasta", "rhub", "extrafont",
   "fs", "ggplot2", "glue", "janitor", "jpeg",
-  "knitr", "png", "purrr", "readxl", "rmarkdown",
+  "knitr", "png", "purrr", "rmarkdown",
   "shiny", "shinyjs", "showtext", "spelling",
   "stringr", "styler", "sysfonts",
   "testthat", "tibble", "vroom", "waldo") -> ext_pkgs
