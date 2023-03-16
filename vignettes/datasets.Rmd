@@ -20,6 +20,8 @@ library(segtools)
 
 `AppLookUpRiskCat` vs. `LookUpRiskCat`
 
+There are two `LookUpRiskCat` datasets in the [data GitHub repo](https://github.com/mjfrigaard/seg-shiny-data), below I'll compare their contents. 
+
 ```{r}
 waldo::compare(
   names(segtools::AppLookUpRiskCat),
@@ -41,7 +43,11 @@ waldo::compare(
 )
 ```
 
+`LookUpRiskCat` has two additional columns, but otherwise the `risk_cat`, `ABSLB`, and `ABSUB` are all identical. 
+
 ## `AppRiskPairData` vs `RiskPairData`
+
+The risk pairs data also have two versions (`AppRiskPairData` and `RiskPairData`):
 
 ```{r}
 waldo::compare(
@@ -64,5 +70,16 @@ waldo::compare(
 )
 ```
 
+But the only differences is the `abs_risk` column, which is the absolute value of the `RiskFactor` (easily added)
+
+```{r}
+waldo::compare(
+  # abs_risk in AppRiskPairData
+  segtools::AppRiskPairData$abs_risk,
+  # abs of RiskFactor in RiskPairData
+  abs(segtools::RiskPairData$RiskFactor)
+)
+
+```
 
 

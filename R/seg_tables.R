@@ -51,7 +51,6 @@ seg_bgm_ref_vars <- function(data, is_path) {
 #'
 #' @param data Dataset containing only `BGM` and `REF` columns
 #' @param is_path logical, dataset or path to dataset
-#' @param app_data logical, include data with `App` prefix
 #'
 #' @return seg risk pair variables
 #' @export seg_risk_pairs
@@ -83,7 +82,7 @@ seg_risk_pairs <- function(data, is_path) {
 #' @param is_path logical, dataset or path to dataset
 #'
 #' @return seg risk category variables
-#' @export seg_risk_pairs
+#' @export seg_risk_cats
 #'
 #' @importFrom dplyr mutate case_when inner_join
 #' @importFrom dplyr filter bind_rows if_else
