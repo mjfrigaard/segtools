@@ -94,36 +94,28 @@ seg_mard_table(data = test_data, is_path = FALSE)
     
 3. `seg_risk_grade_table()` returns a table of risk grades 
 
-```{r seg_risk_grade_table, eval=FALSE}
-knitr::kable(
+```{r seg_risk_grade_table}
 seg_risk_grade_table(data = test_data, is_path = FALSE)
-)
 ```
 
 
 4. `seg_risk_level_table()` return a table of risk levels and categories
 
 ```{r seg_risk_level_table, eval=FALSE}
-knitr::kable(
 seg_risk_level_table(data = test_data, is_path = FALSE)
-)
 ```
 
 
 5. `seg_iso_range_table()` returns a table of compliance ranges 
 
 ```{r seg_iso_range_table, eval=FALSE}
-knitr::kable(
 seg_iso_range_table(data = test_data, is_path = FALSE)
-)
 ```
 
-5. `seg_binom_table()` returns a table binomial test for compliant pairs
+6. `seg_binom_table()` returns a table binomial test for compliant pairs
 
-```{r seg_binom_table, eval=FALSE}
-knitr::kable(
+```{r seg_binom_table}
 seg_binom_table(data = test_data, is_path = FALSE)
-)
 ```
 
 ## Graphs 
