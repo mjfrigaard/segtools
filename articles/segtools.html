@@ -168,36 +168,42 @@ lower/upper 95% CI</li>
 grades</li>
 </ol>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
-<span><span class="fu"><a href="../reference/seg_risk_grade_table.html">seg_risk_grade_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_risk_grade_table.html">seg_risk_grade_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 5</span></span></span>
+<span><span class="co">#&gt;      ID `Risk Grade` `Number of Pairs` Percent `Risk Factor Range`</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 A                         <span style="text-decoration: underline;">2</span>876 96%     0 - 0.5            </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 B                           88 2.9%    &gt; 0.5 - 1.0        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 C                           24 0.8%    &gt; 1.0 - 2.0        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4 D                            7 0.2%    &gt; 2.0 - 3.0        </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5 E                           <span style="color: #BB0000;">NA</span> NA      &gt; 3.0</span></span></code></pre></div>
 <ol start="4" style="list-style-type: decimal">
 <li>
 <code><a href="../reference/seg_risk_level_table.html">seg_risk_level_table()</a></code> return a table of risk levels
 and categories</li>
 </ol>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
-<span><span class="fu"><a href="../reference/seg_risk_level_table.html">seg_risk_level_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_risk_level_table.html">seg_risk_level_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <ol start="5" style="list-style-type: decimal">
 <li>
 <code><a href="../reference/seg_iso_range_table.html">seg_iso_range_table()</a></code> returns a table of compliance
 ranges</li>
 </ol>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
-<span><span class="fu"><a href="../reference/seg_iso_range_table.html">seg_iso_range_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<ol start="5" style="list-style-type: decimal">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_iso_range_table.html">seg_iso_range_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<ol start="6" style="list-style-type: decimal">
 <li>
 <code><a href="../reference/seg_binom_table.html">seg_binom_table()</a></code> returns a table binomial test for
 compliant pairs</li>
 </ol>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span></span>
-<span><span class="fu"><a href="../reference/seg_binom_table.html">seg_binom_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_binom_table.html">seg_binom_table</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">test_data</span>, is_path <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 1 × 5</span></span></span>
+<span><span class="co">#&gt;   `Compliant Pairs` `Compliant Pairs %` Lower Bound for Accepta…¹ Lower…² Result</span></span>
+<span><span class="co">#&gt;               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>              <span style="text-decoration: underline;">2</span>808 93.8%                                    <span style="text-decoration: underline;">2</span>825 94.3%   93.8%…</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># … with abbreviated variable names ¹​`Lower Bound for Acceptance`,</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;">#   ²​`Lower Bound for Acceptance %`</span></span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="graphs">Graphs<a class="anchor" aria-label="anchor" href="#graphs"></a>

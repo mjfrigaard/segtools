@@ -53,15 +53,56 @@
 </li>
 </ul><div class="section level3">
 <h3 id="pkgdown-0-0-0-9000"><code>pkgdown</code><a class="anchor" aria-label="anchor" href="#pkgdown-0-0-0-9000"></a></h3>
-<p>The various <code>pkgdown</code> builds/failures are listed below:</p>
-<ol style="list-style-type: decimal"><li><p><a href="https://github.com/mjfrigaard/segtools/commit/e8b14747709d01356d76712a6cc027dd71aa0d00" class="external-link">Build #1</a></p></li>
-<li><p><a href="https://github.com/mjfrigaard/segtools/commit/7679b1460a950230363ff0fcc798830e65a2106d" class="external-link">Build #2</a></p></li>
-<li><p><a href="https://github.com/mjfrigaard/segtools/commit/9850bc329daceb92c126e51028b03ce974a9e198" class="external-link">Build #3</a></p></li>
-<li><p><a href="https://github.com/mjfrigaard/segtools/commit/59b4745f6b66c51e539018de5013fc82b2c8ff9a" class="external-link">Build #5</a></p></li>
-<li><p><a href="https://github.com/mjfrigaard/segtools/commit/6668bfb4894b145794e48c6dd451d1e5e00a4fab" class="external-link">Build #6</a></p></li>
-<li><p><a href="https://github.com/mjfrigaard/segtools/commit/e11fb2da9b558d94ad05cff0a5468e93c2bfd2b9" class="external-link">Build #7</a></p></li>
-</ol><ul><li><p>Building the <code>pkgdown</code> version of the package has been a nightmare.</p></li>
-<li><p>Added a <code>NEWS.md</code> file to track changes to the package.</p></li>
+<ul><li><p>Building the <code>pkgdown</code> version of the package has been a nightmare. The various <code>pkgdown</code> builds/failures are listed below:</p></li>
+<li><p><a href="https://github.com/mjfrigaard/segtools/commit/e8b14747709d01356d76712a6cc027dd71aa0d00" class="external-link">Build #1</a></p></li>
+<li><p><a href="https://github.com/mjfrigaard/segtools/commit/7679b1460a950230363ff0fcc798830e65a2106d" class="external-link">pkgdown build #3 #2</a> and <a href="https://github.com/mjfrigaard/segtools/commit/59b4745f6b66c51e539018de5013fc82b2c8ff9a" class="external-link">pkgdown build #5 #3</a> had the same error on <code>readxl</code></p></li>
+</ul><div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">✖</span> Failed to build segtools 0.0.0.9000</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Error:</span> </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="ot">! </span><span class="ex">error</span> in pak subprocess</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Caused</span> by error in <span class="kw">`</span><span class="ex">stop_task_build</span><span class="er">(</span><span class="ex">state,</span> worker<span class="kw">)`</span>:</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="ot">! </span><span class="ex">Failed</span> to build source package <span class="st">'segtools'</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Full</span> installation output:</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">*</span> installing <span class="pp">*</span>source<span class="pp">*</span> package ‘segtools’ ...</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="ex">staged</span> installation is only possible with locking</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="ex">**</span> using non-staged installation</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="ex">**</span> R</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>  <span class="ex">**</span> data</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="ex">***</span> moving datasets to lazyload DB</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>  <span class="ex">**</span> inst</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="ex">**</span> byte-compile and prepare package for lazy loading</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">Error</span> in loadNamespace<span class="er">(</span><span class="ex">j</span> <span class="op">&lt;</span>- i[[1L]], c<span class="er">(</span><span class="ex">lib.loc,</span> .libPaths<span class="er">(</span><span class="kw">))</span><span class="ex">,</span> versionCheck = vI[[j]]<span class="kw">)</span> <span class="bu">:</span> </span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>    <span class="ex">there</span> is no package called ‘readxl’</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Calls:</span> <span class="op">&lt;</span>Anonymous<span class="op">&gt;</span> ... loadNamespace <span class="at">-</span><span class="op">&gt;</span> withRestarts <span class="at">-</span><span class="op">&gt;</span> withOneRestart <span class="at">-</span><span class="op">&gt;</span> doWithOneRestart</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Execution</span> halted</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>  <span class="ex">ERROR:</span> lazy loading failed for package ‘segtools’</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  <span class="ex">*</span> removing ‘/tmp/RtmpHJLGW5/pkg-lib1352430479ed/segtools’</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="ex">---</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Backtrace:</span></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>  <span class="ex">1.</span> pak::lockfile_install<span class="er">(</span><span class="st">".github/pkg.lock"</span><span class="kw">)</span></span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>  <span class="ex">2.</span> pak:::remote<span class="er">(</span><span class="kw">function(</span><span class="ex">...</span><span class="kw">)</span> <span class="kw">{</span> <span class="ex">…</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>  <span class="ex">3.</span> err<span class="va">$throw</span><span class="er">(</span><span class="ex">res</span><span class="va">$error</span><span class="kw">)</span></span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>  <span class="ex">---</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Subprocess</span> backtrace:</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>   <span class="ex">1.</span> base::withCallingHandlers<span class="er">(</span><span class="ex">cli_message</span> = function<span class="er">(</span><span class="ex">msg</span><span class="kw">)</span> <span class="kw">{</span> <span class="ex">…</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>   <span class="ex">2.</span> get<span class="er">(</span><span class="st">"lockfile_install_internal"</span><span class="ex">,</span> asNamespace<span class="er">(</span><span class="st">"pak"</span><span class="kw">))(</span><span class="ex">...</span><span class="kw">)</span></span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>   <span class="ex">3.</span> plan<span class="va">$install</span><span class="er">(</span><span class="kw">)</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>   <span class="ex">4.</span> pkgdepends::install_package_plan<span class="er">(</span><span class="ex">plan,</span> lib = private<span class="va">$library</span>, num_workers = nw, …</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>   <span class="ex">5.</span> base::withCallingHandlers<span class="er">(</span><span class="kw">{</span> <span class="ex">…</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>   <span class="ex">6.</span> pkgdepends:::handle_events<span class="er">(</span><span class="ex">state,</span> events<span class="kw">)</span></span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>   <span class="ex">7.</span> pkgdepends:::handle_event<span class="er">(</span><span class="ex">state,</span> i<span class="kw">)</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>   <span class="ex">8.</span> pkgdepends:::stop_task<span class="er">(</span><span class="ex">state,</span> worker<span class="kw">)</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>   <span class="ex">9.</span> pkgdepends:::stop_task_build<span class="er">(</span><span class="ex">state,</span> worker<span class="kw">)</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>  <span class="ex">10.</span> base::throw<span class="er">(</span><span class="ex">new_pkg_build_error</span><span class="er">(</span><span class="st">"Failed to build source package {pkg}"</span><span class="ex">,</span> …</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>  <span class="ex">11.</span> <span class="kw">|</span> <span class="ex">base::signalCondition</span><span class="er">(</span><span class="ex">cond</span><span class="kw">)</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>  <span class="ex">12.</span> global <span class="er">(</span><span class="kw">function</span> <span class="kw">(</span><span class="ex">e</span><span class="kw">)</span> <span class="ex">…</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Execution</span> halted</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>  <span class="ex">Error:</span> Process completed with exit code 1.</span></code></pre></div>
+<p>After removing the <code>readxl</code> from the package, the build worked (almost).</p>
+<ol start="5" style="list-style-type: decimal"><li><a href="https://github.com/mjfrigaard/segtools/actions/runs/4440538030" class="external-link">Buildpkgdown build #7 #5</a></li>
+</ol><p><code>The deploy step encountered an error: The process '/usr/bin/git' failed with exit code 128 ❌</code></p>
+<p>This required changing the settings under <strong>Settings</strong> &gt; <strong>Actions</strong> &gt; <strong>General</strong> &gt; change <em>Workflow permissions</em> to <em>Read and write permissions</em></p>
+<ol start="6" style="list-style-type: decimal"><li><a href="https://github.com/mjfrigaard/segtools/commit/e11fb2da9b558d94ad05cff0a5468e93c2bfd2b9" class="external-link">Build #7</a></li>
+</ol><ul><li>Added a <code>NEWS.md</code> file to track changes to the package.</li>
 </ul></div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
