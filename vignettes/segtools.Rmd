@@ -25,27 +25,20 @@ knitr::opts_chunk$set(
 # colourpicker install
 # devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
 # import font ----
-if (!requireNamespace('pak')) {
-    install.packages('pak', repos = 'https://r-lib.github.io/p/pak/dev/')
-}
-ext_pkgs <- c('dplyr', 'vroom', 'janitor', 'extrafont', 'sysfonts', 'showtext')
-pak::pkg_install(ext_pkgs)
 library(extrafont)
 extrafont::loadfonts(quiet = TRUE)
 extrafont::font_import(
     paths = "../inst/assets/Ubuntu/",
     prompt = FALSE)
-
 # add font ----
 sysfonts::font_add(
     family =  "Ubuntu", 
     regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
-
 # if necessary: 
 # remotes::install_github("yixuan/showtext", force = TRUE)
 library(showtext)
 # add Arial
-sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
 showtext::showtext_auto()
 ```
 

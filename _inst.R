@@ -10,4 +10,5 @@ c("attachment", "cli", "config", "devtools",
 if (!requireNamespace('pak')) {
     install.packages('pak', repos = 'https://r-lib.github.io/p/pak/dev/')
 }
+# ext_pkgs <- c('dplyr', 'vroom', 'janitor', 'extrafont', 'sysfonts', 'showtext')
 pak::pkg_install(ext_pkgs)
