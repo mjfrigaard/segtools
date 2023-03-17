@@ -70,52 +70,96 @@ dplyr::glimpse(test_data)
 
 The summary tables rely on separate functions for each table. 
 
+### Pairs table
+
 1. `seg_pairs_table()` returns the pairs comparing `BGM` to `REF`
 
-```{r}
+```{r seg_pairs_table-show, eval=FALSE}
 seg_pairs_table(data = test_data, is_path = FALSE)
 ```
 
+```{r seg_pairs_table-run, echo=FALSE}
+knitr::kable(seg_pairs_table(data = test_data, is_path = FALSE))
+```
+
+### MARD table
 
 2. The MARD table requires two functions: 
 
   - `seg_risk_vars()` to calculate the intermediate risk variables  
     
-```{r}
+```{r seg_risk_vars-run, eval=TRUE}
 seg_risk_vars(data = test_data, is_path = FALSE) |> glimpse()
 ```
 
   
   - `seg_mard_table()` to calculate the Bias, MARD, CV, and lower/upper 95% CI 
     
-```{r seg_mard_table}
+```{r seg_mard_table-show, eval=FALSE}
 seg_mard_table(data = test_data, is_path = FALSE)
 ```
-    
+
+```{r seg_mard_table-run, echo=FALSE}
+knitr::kable(
+seg_mard_table(data = test_data, is_path = FALSE)
+)
+```
+
+### Risk grade table    
+
 3. `seg_risk_grade_table()` returns a table of risk grades 
 
-```{r seg_risk_grade_table}
+```{r seg_risk_grade_table-show, eval=FALSE}
 seg_risk_grade_table(data = test_data, is_path = FALSE)
 ```
 
+```{r seg_risk_grade_table-run, echo=FALSE}
+knitr::kable(
+seg_risk_grade_table(data = test_data, is_path = FALSE)
+)
+```
+
+### Risk level table
 
 4. `seg_risk_level_table()` return a table of risk levels and categories
 
-```{r seg_risk_level_table, eval=FALSE}
+```{r seg_risk_level_table-show, eval=FALSE}
 seg_risk_level_table(data = test_data, is_path = FALSE)
 ```
 
+```{r seg_risk_level_table-run, echo=FALSE}
+knitr::kable(
+seg_risk_level_table(data = test_data, is_path = FALSE)
+)
+```
+
+
+### ISO range table
 
 5. `seg_iso_range_table()` returns a table of compliance ranges 
 
-```{r seg_iso_range_table, eval=FALSE}
+```{r seg_iso_range_table-show, eval=FALSE}
 seg_iso_range_table(data = test_data, is_path = FALSE)
 ```
 
+```{r seg_iso_range_table-run, echo=FALSE}
+knitr::kable(
+seg_iso_range_table(data = test_data, is_path = FALSE)
+)
+```
+
+### Compliant pairs table
+
 6. `seg_binom_table()` returns a table binomial test for compliant pairs
 
-```{r seg_binom_table}
+```{r seg_binom_table-show, eval=FALSE}
 seg_binom_table(data = test_data, is_path = FALSE)
+```
+
+```{r seg_binom_table-run, echo=FALSE}
+knitr::kable(
+seg_binom_table(data = test_data, is_path = FALSE)
+)
 ```
 
 ## Graphs 

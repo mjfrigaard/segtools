@@ -47,21 +47,21 @@ seg_risk_vars <- function(data, is_path) {
         iso_diff > 15 & iso_diff <= 20 ~ "> 15 - 20% mg/dL",
         iso_diff > 20 ~ "> 20% or 20 mg/dL"
       ),
-    ## create risk_grade variable ----
+    ## risk_grade variable ----
     risk_grade = dplyr::case_when(
       abs_risk >= 0.0 & abs_risk < 0.5 ~ "A",
-      abs_risk >= 0.5 & abs_risk < 1.0 ~ "B",
-      abs_risk >= 1.0 & abs_risk < 2.0 ~ "C",
-      abs_risk >= 2.0 & abs_risk < 3.0 ~ "D",
-      abs_risk >= 3.0 ~ "E"
+      abs_risk >= 0.5 & abs_risk < 1.5 ~ "B",
+      abs_risk >= 1.5 & abs_risk < 2.5 ~ "C",
+      abs_risk >= 2.5 & abs_risk < 3.5 ~ "D",
+      abs_risk >= 3.5 ~ "E"
     ),
-    ## create risk_grade_txt variable ----
+    ## risk_grade_txt variable ----
     risk_grade_txt = dplyr::case_when(
       abs_risk >= 0.0 & abs_risk < 0.5 ~ "0 - 0.5",
-      abs_risk >= 0.5 & abs_risk < 1.0 ~ "> 0.5 - 1.0",
-      abs_risk >= 1.0 & abs_risk < 2.0 ~ "> 1.0 - 2.0",
-      abs_risk >= 2.0 & abs_risk < 3.0 ~ "> 2.0 - 3.0",
-      abs_risk >= 3.0 ~ "> 3.0"
+      abs_risk >= 0.5 & abs_risk < 1.5 ~ "> 0.5 - 1.5",
+      abs_risk >= 1.5 & abs_risk < 2.5 ~ "> 1.5 - 2.5",
+      abs_risk >= 2.5 & abs_risk < 3.5 ~ "> 2.5 - 3.5",
+      abs_risk >= 3.0 ~ "> 3.5"
     )
   )
   return(seg_risk_tbl)

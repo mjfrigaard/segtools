@@ -1,0 +1,344 @@
+---
+title: "SEG shiny app tables"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SEG shiny app tables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(vroom)
+library(janitor)
+```
+
+# Objective 
+
+In this vignette, I'm going to compare the results from the `segtools` package to the shiny application on the [Diabetes technology society website.](https://www.diabetestechnology.org/seg/)
+
+## Test Data 
+
+I'll load the same test data used in [the GitHub repo](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL58-L58C47) (`VanderbiltComplete.csv`) 
+
+```{r test_vand_comp_data}
+github_data_root <-
+  "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+full_sample_repo <- base::paste0(github_data_root,
+  "VanderbiltComplete.csv")
+test_vand_comp_data <-
+  vroom::vroom(file = full_sample_repo, delim = ",")
+glimpse(test_vand_comp_data)
+```
+
+## Pair type table
+
+After uploading `VanderbiltComplete.csv`, the first table in the **Summary Tables** tab is the pairs table: 
+
+```{r vand_comp_pair_type, echo=FALSE, out.width='50%', fig.align='center'}
+knitr::include_graphics(path = "../man/figures/vand_comp_pair_type.png")
+```
+
+To test the `segtools` package function, I'll need to store the table above in something we can test (`app_pairs_tbl`)
+
+```{r app_pairs_tbl, eval=FALSE}
+app_pairs_tbl = tibble::as_tibble(data.frame(
+  stringsAsFactors = FALSE,
+  check.names = FALSE,
+  `Pair Type` = c(
+    "Total",
+    "BGM < REF",
+    "BGM = REF",
+    "BGM > REF",
+    "REF > 600: Excluded from SEG Analysis",
+    "Total included in SEG Analysis"
+  ),
+  Count = c(9891L, 4710L, 479L, 4702L, 23L, 9868L)
+))
+app_pairs_tbl
+```
+
+```{r kable-app_pairs_tbl, echo=FALSE}
+app_pairs_tbl = tibble::as_tibble(data.frame(
+  stringsAsFactors = FALSE,
+  check.names = FALSE,
+  `Pair Type` = c(
+    "Total",
+    "BGM < REF",
+    "BGM = REF",
+    "BGM > REF",
+    "REF > 600: Excluded from SEG Analysis",
+    "Total included in SEG Analysis"
+  ),
+  Count = c(9891L, 4710L, 479L, 4702L, 23L, 9868L)
+))
+knitr::kable(app_pairs_tbl)
+```
+
+The output `segtools::seg_pairs_table()` function is in the `pkg_pairs_tbl`
+
+```{r show-pkg_pairs_tbl, eval=FALSE}
+pkg_pairs_tbl <- 
+    seg_pairs_table(data = test_vand_comp_data,
+                    is_path = FALSE)
+pkg_pairs_tbl
+```
+
+```{r pkg_pairs_tbl, echo=FALSE}
+(pkg_pairs_tbl = 
+    seg_pairs_table(data = test_vand_comp_data,
+                    is_path = FALSE)) |> 
+  knitr::kable()
+```
+
+### Test pairs table 
+
+Test the application output to the package output: 
+
+```{r}
+testthat::test_that("Test pair type table", {
+  testthat::expect_equal(
+    # function table
+    object = pkg_pairs_tbl, 
+    # application table
+    expected = app_pairs_tbl
+  )
+})
+```
+
+## MARD table
+
+The MARD table in the application is below: 
+
+```{r vand_comp_mard, echo=FALSE, fig.align='center'}
+knitr::include_graphics(path = "../man/figures/vand_comp_mard.png")
+```
+
+Store the app MARD table in something I can test against the `seg_mard_table()` outpput (`app_mard`).
+
+```{r show-print-app_mard, eval=FALSE}
+app_mard <- tibble::tibble(
+    Total = 9868L,
+    Bias = "0.6%",
+    MARD = "7%",
+    CV = "14.8%",
+    `Lower 95% Limit of Agreement` = "-28.3%",
+    `Upper 95% Limit of Agreement` = "29.6%")
+app_mard
+```
+
+```{r kable-print-app_mard, echo=FALSE}
+app_mard <- tibble::tibble(
+    Total = 9868L,
+    Bias = "0.6%",
+    MARD = "7%",
+    CV = "14.8%",
+    `Lower 95% Limit of Agreement` = "-28.3%",
+    `Upper 95% Limit of Agreement` = "29.6%")
+knitr::kable(app_mard)
+```
+
+I'll store the output from `seg_mard_table()` in `pkg_mard`:
+
+```{r pkg_mard}
+pkg_mard <- tibble::as_tibble(
+  seg_mard_table(data = test_vand_comp_data, is_path = FALSE))
+```
+
+```{r show-print-pkg_mard, eval=FALSE}
+pkg_mard
+```
+
+```{r kable-print-pkg_mard, echo=FALSE}
+knitr::kable(pkg_mard)
+```
+
+### Test MARD table 
+
+Below I test both MARD tabels
+
+```{r}
+testthat::test_that("Test MARD table values", {
+testthat::expect_equal(
+  # function table
+  object = pkg_mard, 
+  # application table
+  expected = app_mard
+  )
+})
+```
+
+## Risk grade table
+
+```{r vand_comp_risk_grade-png, echo=FALSE}
+knitr::include_graphics(path = "../man/figures/vand_comp_risk_grade.png")
+```
+
+The risk grade level is a little trickier to replicate because of it's structure (I need to wrap the output `tibble` in the `data.frame`).
+
+```{r app_risk_grade_table}
+app_risk_grade_table <- as.data.frame(
+  tibble::tibble(
+    ID = c(1L, 2L, 3L, 4L, 5L),
+    `Risk Grade` = c('A', 'B', 'C', 'D', 'E'),
+    `Number of Pairs` = c(9474L, 349L, 35L, 10L, NA_integer_),
+    Percent = c('96%', '3.5%', '0.4%', '0.1%', NA_character_),
+    `Risk Factor Range` = c('0 - 0.5', '> 0.5 - 1.5', '> 1.5 - 2.5',
+      '> 2.5 - 3.5', '> 3.5'),
+  )
+)
+```
+
+```{r show-app_risk_grade_table, eval=FALSE}
+app_risk_grade_table
+```
+
+```{r run-app_risk_grade_table, echo=FALSE}
+knitr::kable(app_risk_grade_table)
+```
+
+The package function for creating the risk grade table is `seg_risk_grade_table()` (which I will store in `pkg_risk_grade_table`)
+
+```{r pkg_risk_grade_table}
+pkg_risk_grade_table <- segtools::seg_risk_grade_table(
+  data = test_vand_comp_data, is_path = FALSE)
+```
+
+```{r show-pkg_risk_grade_table, eval=FALSE}
+pkg_risk_grade_table
+```
+
+```{r kable-pkg_risk_grade_table, echo=FALSE}
+knitr::kable(pkg_risk_grade_table)
+```
+
+
+### Test risk grade table
+
+We'll limit the test to the `Number of Pairs` column and make sure it's a match.
+
+```{r , error=TRUE}
+testthat::test_that("Test risk grade table", {
+testthat::expect_equal(
+  # function table
+  object = pkg_risk_grade_table$`Number of Pairs`, 
+  # application table
+  expected = app_risk_grade_table$`Number of Pairs`
+  )
+})
+```
+
+
+## Risk category/level table
+
+Below is the app display of the risk level table.
+
+```{r , echo=FALSE}
+knitr::include_graphics(path = "../man/figures/vand_comp_risk_level.png")
+```
+
+Below is a re-creation of this table (for testing)
+
+```{r app_risk_level_table}
+app_risk_level_table <- as.data.frame(
+  tibble::tibble(
+    `SEG Risk Level` = c(0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L),
+    `SEG Risk Category` = c(
+      'None', 
+      'Slight, Lower', 'Slight, Higher',
+      'Moderate, Lower','Moderate, Higher',
+      'Severe, Lower', 'Severe, Higher',
+      'Extreme'
+    ),
+    `Number of Pairs` = c(9474L, 249L, 55L, 24L, 11L, 10L, NA_integer_, NA_integer_),
+    Percent = c(
+      '96%', '3%', '0.6%', '0.2%', '0.1%', '0.1%', NA_character_, NA_character_
+    ),
+  )
+)
+```
+
+
+```{r show-app_risk_level_table, eval=FALSE}
+app_risk_level_table
+```
+
+```{r run-app_risk_level_table, echo=FALSE}
+knitr::kable(app_risk_level_table)
+```
+
+```{r pkg_risk_level_table}
+pkg_risk_level_table <- seg_risk_level_table(data = test_vand_comp_data, 
+                                              is_path = FALSE)
+```
+
+```{r show-pkg_risk_level_table, eval=FALSE}
+pkg_risk_level_table
+```
+
+```{r run-pkg_risk_level_table, echo=FALSE}
+knitr::kable(pkg_risk_level_table)
+```
+
+
+### Test risk level table
+
+We'll limit the test to the `Number of Pairs` column and make sure it's a match.
+
+```{r , error=TRUE}
+waldo::compare(
+  # function table
+  x = pkg_risk_level_table$`Number of Pairs`,
+  # application table
+  y = app_risk_level_table$`Number of Pairs`
+  )
+```
+
+## ISO range table
+
+***In development***
+
+```{r , echo=FALSE}
+tibble::tribble(
+     ~ID,          ~`ISO range`,    ~N, ~Percent,
+      1L,    "<= 5% or 5 mg/dL", 5328L,    "54%",
+      2L,  "> 5 - 10% or mg/dL", 2842L,  "28.8%",
+      3L, "> 10 - 15% or mg/dL", 1050L,  "10.6%",
+      4L,    "> 15 - 20% mg/dL",  340L,   "3.4%",
+      5L,   "> 20% or 20 mg/dL",  308L,   "3.1%"
+     )
+```
+
