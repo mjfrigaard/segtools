@@ -48,7 +48,7 @@
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
     <a class="dropdown-item" href="../articles/datasets.html">Lookup datasets</a>
-    <a class="dropdown-item" href="../articles/shiny-app.html">SEG shiny app tables</a>
+    <a class="dropdown-item" href="../articles/risk-tables.html">Risk Tables</a>
   </div>
 </li>
 <li class="nav-item">
@@ -81,79 +81,96 @@
     
     
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/segtools/">segtools</a></span><span class="op">)</span></span></code></pre></div>
-<p><code>AppLookUpRiskCat</code> vs. <code>LookUpRiskCat</code></p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://mjfrigaard.github.io/segtools/">segtools</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://waldo.r-lib.org" class="external-link">waldo</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/diffobj" class="external-link">diffobj</a></span><span class="op">)</span></span></code></pre></div>
+<p>All the previous dataets in the <a href="https://github.com/quesgen/seg-shiny-1-3-3" class="external-link">shiny app</a> can be
+accessed with the <code><a href="../reference/get_seg_data.html">get_seg_data()</a></code> function. For a full list
+of datasets in the <a href="https://github.com/mjfrigaard/seg-shiny-data/tree/master/Data" class="external-link">seg-shiny-data/Data
+repo</a>, use the <code>data = names</code> argument:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_seg_data.html">get_seg_data</a></span><span class="op">(</span>data <span class="op">=</span> <span class="st">"names"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "VanderbiltComplete.csv"   "AppRiskPairData.csv"     </span></span>
+<span><span class="co">#&gt;  [3] "RiskPairData.csv"         "AppLookUpRiskCat.csv"    </span></span>
+<span><span class="co">#&gt;  [5] "LookUpRiskCat.csv"        "AppTestData.csv"         </span></span>
+<span><span class="co">#&gt;  [7] "AppTestDataSmall.csv"     "AppTestDataMed.csv"      </span></span>
+<span><span class="co">#&gt;  [9] "AppTestDataBig.csv"       "FullSampleData.csv"      </span></span>
+<span><span class="co">#&gt; [11] "ModBAData.csv"            "No_Interference_Dogs.csv"</span></span>
+<span><span class="co">#&gt; [13] "SEGRiskTable.csv"         "SampMeasData.csv"        </span></span>
+<span><span class="co">#&gt; [15] "SampleData.csv"           "lkpRiskGrade.csv"        </span></span>
+<span><span class="co">#&gt; [17] "lkpSEGRiskCat4.csv"</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="applookupriskcat-vs--lookupriskcat">
+<code>AppLookUpRiskCat</code> vs. <code>LookUpRiskCat</code><a class="anchor" aria-label="anchor" href="#applookupriskcat-vs--lookupriskcat"></a>
+</h2>
 <p>There are two <code>LookUpRiskCat</code> datasets in the <a href="https://github.com/mjfrigaard/seg-shiny-data" class="external-link">data GitHub
 repo</a>, below I’ll compare their contents.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">segtools</span><span class="fu">::</span><span class="va">AppLookUpRiskCat</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">segtools</span><span class="fu">::</span><span class="va">LookUpRiskCat</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; `old`: <span style="color: #555555;">"risk_cat"</span> <span style="color: #555555;">"ABSLB"</span> <span style="color: #555555;">"ABSUB"</span>                                 </span></span>
-<span><span class="co">#&gt; `new`: <span style="color: #555555;">"risk_cat"</span> <span style="color: #555555;">"ABSLB"</span> <span style="color: #555555;">"ABSUB"</span> <span style="color: #0000BB;">"RiskCatRangeTxt"</span> <span style="color: #0000BB;">"RiskCatLabel"</span></span></span>
-<span></span>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_seg_data.html">get_seg_data</a></span><span class="op">(</span><span class="st">"AppLookUpRiskCat"</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_seg_data.html">get_seg_data</a></span><span class="op">(</span><span class="st">"LookUpRiskCat"</span><span class="op">)</span></span>
 <span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">AppLookUpRiskCat</span><span class="op">$</span><span class="va">risk_cat</span>,</span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">LookUpRiskCat</span><span class="op">$</span><span class="va">risk_cat</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; `old[2:3]`:                           <span style="color: #555555;">"ABSLB"</span>           <span style="color: #555555;">"ABSUB"</span>       </span></span>
+<span><span class="co">#&gt; `new`:      <span style="color: #00BB00;">"RiskCat"</span> <span style="color: #00BB00;">"ABSLB"</span> <span style="color: #00BB00;">"ABSUB"</span> <span style="color: #00BB00;">"RiskCatRangeTxt"</span> <span style="color: #00BB00;">"RiskCatLabel"</span></span></span>
+<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">risk_cat</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span><span class="op">$</span><span class="va">RiskCat</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span>
+<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">ABSLB</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span><span class="op">$</span><span class="va">ABSLB</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span>
 <span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">AppLookUpRiskCat</span><span class="op">$</span><span class="va">ABSLB</span>,</span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">LookUpRiskCat</span><span class="op">$</span><span class="va">ABSLB</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span>
-<span></span>
-<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">AppLookUpRiskCat</span><span class="op">$</span><span class="va">ABSUB</span>,</span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">LookUpRiskCat</span><span class="op">$</span><span class="va">ABSUB</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">ABSUB</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span><span class="op">$</span><span class="va">ABSUB</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span></code></pre></div>
 <p><code>LookUpRiskCat</code> has two additional columns, but otherwise
 the <code>risk_cat</code>, <code>ABSLB</code>, and <code>ABSUB</code>
 are all identical.</p>
+</div>
 <div class="section level2">
 <h2 id="appriskpairdata-vs-riskpairdata">
 <code>AppRiskPairData</code> vs <code>RiskPairData</code><a class="anchor" aria-label="anchor" href="#appriskpairdata-vs-riskpairdata"></a>
 </h2>
 <p>The risk pairs data also have two versions
 (<code>AppRiskPairData</code> and <code>RiskPairData</code>):</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">segtools</span><span class="fu">::</span><span class="va">AppRiskPairData</span><span class="op">)</span>,</span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu">segtools</span><span class="fu">::</span><span class="va">RiskPairData</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; `old[2:5]`: <span style="color: #555555;">"REF"</span> <span style="color: #555555;">"BGM"</span> <span style="color: #555555;">"RiskFactor"</span> <span style="color: #BBBB00;">"abs_risk"</span></span></span>
-<span><span class="co">#&gt; `new[2:4]`: <span style="color: #555555;">"REF"</span> <span style="color: #555555;">"BGM"</span> <span style="color: #555555;">"RiskFactor"</span></span></span>
-<span></span>
-<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">AppRiskPairData</span><span class="op">$</span><span class="va">REF</span>,</span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">RiskPairData</span><span class="op">$</span><span class="va">REF</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span>
-<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">AppRiskPairData</span><span class="op">$</span><span class="va">BGM</span>,</span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">RiskPairData</span><span class="op">$</span><span class="va">BGM</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span>
-<span></span>
-<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">AppRiskPairData</span><span class="op">$</span><span class="va">RiskFactor</span>,</span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">RiskPairData</span><span class="op">$</span><span class="va">RiskFactor</span></span>
-<span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span></code></pre></div>
-<p>But the only differences is the <code>abs_risk</code> column, which
-is the absolute value of the <code>RiskFactor</code> (easily added)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
-<span>  <span class="co"># abs_risk in AppRiskPairData</span></span>
-<span>  <span class="fu">segtools</span><span class="fu">::</span><span class="va">AppRiskPairData</span><span class="op">$</span><span class="va">abs_risk</span>,</span>
-<span>  <span class="co"># abs of RiskFactor in RiskPairData</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="fu">segtools</span><span class="fu">::</span><span class="va">RiskPairData</span><span class="op">$</span><span class="va">RiskFactor</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">x</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_seg_data.html">get_seg_data</a></span><span class="op">(</span><span class="st">"AppRiskPairData"</span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/get_seg_data.html">get_seg_data</a></span><span class="op">(</span><span class="st">"RiskPairData"</span><span class="op">)</span></span>
+<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span>,</span>
+<span>  y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">y</span><span class="op">)</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; `old`:      <span style="color: #555555;">"RiskPairID"</span> <span style="color: #00BB00;">"REF"</span>     <span style="color: #00BB00;">"BGM"</span> <span style="color: #00BB00;">"RiskFactor"</span> <span style="color: #00BB00;">"abs_risk"</span>  </span></span>
+<span><span class="co">#&gt; `new[2:4]`: <span style="color: #00BB00;">"RefVal"</span>     <span style="color: #00BB00;">"MeasVal"</span>                    <span style="color: #555555;">"RiskFactor"</span></span></span>
+<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">REF</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span><span class="op">$</span><span class="va">RefVal</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span>
+<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">BGM</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span><span class="op">$</span><span class="va">MeasVal</span></span>
+<span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span>
+<span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">x</span><span class="op">$</span><span class="va">RiskFactor</span>,</span>
+<span>  y <span class="op">=</span> <span class="va">y</span><span class="op">$</span><span class="va">RiskFactor</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span></code></pre></div>
+<p><code>AppRiskPairData</code> and <code>RiskPairData</code> have three
+identical columns: <code>REF</code>/<code>RefVal</code>,
+<code>BGM</code>/<code>MeasVal</code>, and <code>RiskFactor</code>.</p>
+<p><code>AppRiskPairData</code> has two additional columns
+(<code>RiskPairID</code> and <code>abs_risk</code>).</p>
 </div>
-  </main>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside>
 </div>
 
 

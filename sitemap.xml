@@ -10,10 +10,10 @@
     <loc>https://mjfrigaard.github.io/segtools/articles/index.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/articles/segtools.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/articles/risk-tables.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/articles/shiny-app.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/articles/segtools.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/authors.html</loc>
@@ -25,9 +25,6 @@
     <loc>https://mjfrigaard.github.io/segtools/news/index.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/app_data_switch.html</loc>
-  </url>
-  <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/get_extdata.html</loc>
   </url>
   <url>
@@ -35,6 +32,9 @@
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/get_pkgs.html</loc>
+  </url>
+  <url>
+    <loc>https://mjfrigaard.github.io/segtools/reference/get_seg_data.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/import_flat_file.html</loc>
@@ -49,40 +49,37 @@
     <loc>https://mjfrigaard.github.io/segtools/reference/rgb2hex.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_bgm_ref_vars.html</loc>
-  </url>
-  <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_binom_table.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_grid.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_iso_range_table.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_iso_range_tbl.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_mard_table.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_iso_vars.html</loc>
+  </url>
+  <url>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_mard_tbl.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_modba.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_pairs_table.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_pair_type_tbl.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cats.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cat_tbl.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_grade_table.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cat_vars.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_level_table.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cols.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_pairs.html</loc>
-  </url>
-  <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_vars.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_grade_tbl.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/theme_seg.html</loc>
