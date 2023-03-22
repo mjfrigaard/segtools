@@ -16,30 +16,39 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(segtools)
+library(waldo)
+library(diffobj)
 ```
 
-`AppLookUpRiskCat` vs. `LookUpRiskCat`
+All the previous dataets in the  [shiny app](https://github.com/quesgen/seg-shiny-1-3-3) can be accessed with the `get_seg_data()` function. For a full list of datasets in the [seg-shiny-data/Data repo](https://github.com/mjfrigaard/seg-shiny-data/tree/master/Data), use the `data = names` argument: 
+
+```{r get_seg_data-names}
+get_seg_data(data = "names")
+```
+
+
+## `AppLookUpRiskCat` vs. `LookUpRiskCat`
 
 There are two `LookUpRiskCat` datasets in the [data GitHub repo](https://github.com/mjfrigaard/seg-shiny-data), below I'll compare their contents. 
 
 ```{r}
+x <- get_seg_data("AppLookUpRiskCat")
+y <- get_seg_data("LookUpRiskCat")
 waldo::compare(
-  names(segtools::AppLookUpRiskCat),
-  names(segtools::LookUpRiskCat)
-)
-
-waldo::compare(
-  segtools::AppLookUpRiskCat$risk_cat,
-  segtools::LookUpRiskCat$risk_cat
+  x = names(x),
+  y = names(y)
 )
 waldo::compare(
-  segtools::AppLookUpRiskCat$ABSLB,
-  segtools::LookUpRiskCat$ABSLB
+  x = x$risk_cat,
+  y = y$RiskCat
 )
-
 waldo::compare(
-  segtools::AppLookUpRiskCat$ABSUB,
-  segtools::LookUpRiskCat$ABSUB
+  x = x$ABSLB,
+  y = y$ABSLB
+)
+waldo::compare(
+  x = x$ABSUB,
+  y = y$ABSUB
 )
 ```
 
@@ -50,36 +59,26 @@ waldo::compare(
 The risk pairs data also have two versions (`AppRiskPairData` and `RiskPairData`):
 
 ```{r}
+x <- get_seg_data("AppRiskPairData")
+y <- get_seg_data("RiskPairData")
 waldo::compare(
-  names(segtools::AppRiskPairData),
-  names(segtools::RiskPairData)
-)
-
-waldo::compare(
-  segtools::AppRiskPairData$REF,
-  segtools::RiskPairData$REF
+  x = names(x),
+  y = names(y)
 )
 waldo::compare(
-  segtools::AppRiskPairData$BGM,
-  segtools::RiskPairData$BGM
+  x = x$REF,
+  y = y$RefVal
 )
-
 waldo::compare(
-  segtools::AppRiskPairData$RiskFactor,
-  segtools::RiskPairData$RiskFactor
+  x = x$BGM,
+  y = y$MeasVal
+)
+waldo::compare(
+  x = x$RiskFactor,
+  y = y$RiskFactor
 )
 ```
 
-But the only differences is the `abs_risk` column, which is the absolute value of the `RiskFactor` (easily added)
+`AppRiskPairData` and `RiskPairData` have three identical columns: `REF`/`RefVal`, `BGM`/`MeasVal`, and `RiskFactor`.
 
-```{r}
-waldo::compare(
-  # abs_risk in AppRiskPairData
-  segtools::AppRiskPairData$abs_risk,
-  # abs of RiskFactor in RiskPairData
-  abs(segtools::RiskPairData$RiskFactor)
-)
-
-```
-
-
+`AppRiskPairData` has two additional columns (`RiskPairID` and `abs_risk`).

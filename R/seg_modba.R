@@ -14,9 +14,9 @@
 #'                package = "segtools"), delim = ",")
 #' seg_modba(data = vanderbilt_complete, is_path = FALSE)
 
-seg_modba <- function(data, is_path) {
+seg_modba <- function(data) {
 
-  risk_tbl <- seg_risk_vars(data = data, is_path = is_path)
+  risk_tbl <- seg_risk_cols(df = data)
 
       # calculate LN of REF and BGM -----
 

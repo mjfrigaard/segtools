@@ -1,7 +1,71 @@
-# segtools 0.0.0.9000
+# segtools 1.0.0
+
+* Updated package functions to match shiny application outputs
+
+  - See vignette [`risk-tables`](https://mjfrigaard.github.io/segtools/articles/risk-tables.html)
+
+<br>
+
+* Unit tests for each function 
+
+    ```bash
+    ==> devtools::test()
+    
+    ℹ Testing segtools
+    ✔ | F W S  OK | Context
+    ✔ |         1 | seg_binom_table [0.5s]                     
+    ✔ |         1 | seg_iso_range_tbl [0.4s]                    
+    ✔ |         1 | seg_iso_vars [0.3s]                         
+    ✔ |         1 | seg_pair_type_tbl                           
+    ✔ |         1 | seg_risk_cat_tbl [0.3s]                    
+    ✔ |         1 | seg_risk_cat_vars [0.3s]                   
+    ✔ |         1 | seg_risk_cols [0.6s]                       
+    ✔ |         1 | seg_risk_grade_tbl [0.3s]                  
+    
+    ══ Results ═══════════════════════════════════
+    Duration: 2.8 s
+    
+    [ FAIL 0 | WARN 0 | SKIP 0 | PASS 8 ]
+    ```
+
+* Data from previous build accessible with `get_seg_data()` function 
+
+    ```r
+    get_seg_data('VanderbiltComplete')
+    # A tibble: 9,891 × 2                                                            
+         BGM   REF
+       <dbl> <dbl>
+     1   121   127
+     2   212   223
+     3   161   166
+     4   191   205
+     5   189   210
+     6   104   100
+     7   293   296
+     8   130   142
+     9   261   231
+    10   147   148
+    # … with 9,881 more rows
+    # ℹ Use `print(n = ...)` to see more rows
+    ```
+    
+    - Use `get_seg_data('names')` for list of datasets 
+    
+    ```r
+    get_seg_data('names')
+     [1] "VanderbiltComplete.csv"   "AppRiskPairData.csv"      "RiskPairData.csv"        
+     [4] "AppLookUpRiskCat.csv"     "LookUpRiskCat.csv"        "AppTestData.csv"         
+     [7] "AppTestDataSmall.csv"     "AppTestDataMed.csv"       "AppTestDataBig.csv"      
+    [10] "FullSampleData.csv"       "ModBAData.csv"            "No_Interference_Dogs.csv"
+    [13] "SEGRiskTable.csv"         "SampMeasData.csv"         "SampleData.csv"          
+    [16] "lkpRiskGrade.csv"         "lkpSEGRiskCat4.csv"  
+    ```
+
+# segtools 0.0.1
 
 * This package has been configured to use the [`pak` + `renv`](https://rstudio.github.io/renv/reference/config.html#configuration) by including `renv.config.pak.enabled = TRUE` in the `.Rprofile` 
 
+# segtools 0.0.0.9000
 ## `pkgdown`
 
 * Building the `pkgdown` version of the package has been a nightmare. The various `pkgdown` builds/failures are listed below: 

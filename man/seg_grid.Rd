@@ -7,7 +7,7 @@
 seg_grid(data, is_path, alpha_var, size_var, color_var)
 }
 \arguments{
-\item{data}{Dataset containing only `BGM` and `REF` columns}
+\item{data}{Dataset containing only \code{BGM} and \code{REF} columns}
 
 \item{is_path}{logical, dataset or path to dataset}
 

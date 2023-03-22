@@ -1,9 +1,11 @@
 ## code to prepare `RiskPairData` dataset goes here
 require(vroom)
-RiskPairData <- vroom::vroom("inst/extdata/RiskPairData.csv")
-names(RiskPairData) <- c("RiskPairID", "REF", "BGM", "RiskFactor")
+github_data_root <-
+      "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+app_riskpair_repo <- base::paste0(
+      github_data_root,
+      "AppRiskPairData.csv"
+    )
+RiskPairData <- vroom::vroom(file = app_riskpair_repo, delim = ",")
 
-# identical(segtools::AppRiskPairData$REF, RiskPairData$REF)
-# identical(segtools::AppRiskPairData$BGM, RiskPairData$BGM)
-#
 usethis::use_data(RiskPairData, overwrite = TRUE)

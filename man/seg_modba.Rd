@@ -4,10 +4,10 @@
 \alias{seg_modba}
 \title{The SEG modified Bland-Altman plot}
 \usage{
-seg_modba(data, is_path)
+seg_modba(data)
 }
 \arguments{
-\item{data}{Dataset containing only `BGM` and `REF` columns}
+\item{data}{Dataset containing only \code{BGM} and \code{REF} columns}
 
 \item{is_path}{logical, dataset or path to dataset}
 }

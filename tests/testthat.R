@@ -9,4 +9,8 @@
 library(testthat)
 library(segtools)
 
-test_check("segtools")
+testthat::test_file(path = "tests/testthat/test-seg_pair_type_tbl.R")
+testthat::test_file(path = "tests/testthat/test-seg_risk_cat_vars.R")
+testthat::test_file(path = "tests/testthat/test-seg_iso_vars.R")
+testthat::test_file(path = "tests/testthat/test-seg_risk_cols.R")
+

@@ -73,7 +73,6 @@ get_extdata <- function(file_name) {
     cli::cli_abort("not a file")
   } else {
     abs_pth <- tools::file_path_as_absolute(pth_detected)
-
     if (isFALSE(fs::file_exists(abs_pth))) {
       cli::cli_abort("not a file")
     } else {
@@ -137,3 +136,47 @@ get_pkgs <- function() {
   dput(pkgs)
 }
 
+#' SEG data switch
+#'
+#' @export get_seg_data
+get_seg_data <- function(data) {
+  gh_root <- "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+  switch(EXPR = data,
+    VanderbiltComplete = vroom::vroom(file = paste0(gh_root, "VanderbiltComplete.csv"), delim = ",", show_col_types = FALSE),
+    # RiskPair ----
+    AppRiskPairData = vroom::vroom(file = paste0(gh_root, "AppRiskPairData.csv"), delim = ",", show_col_types = FALSE),
+    RiskPairData = vroom::vroom(file = paste0(gh_root, "RiskPairData.csv"), delim = ",", show_col_types = FALSE),
+    # RiskCat ----
+    AppLookUpRiskCat = vroom::vroom(file = paste0(gh_root, "AppLookUpRiskCat.csv"), delim = ",", show_col_types = FALSE),
+    LookUpRiskCat = vroom::vroom(file = paste0(gh_root, "LookUpRiskCat.csv"), delim = ",", show_col_types = FALSE),
+    # AppTestData ----
+    AppTestData = vroom::vroom(file = paste0(gh_root, "AppTestData.csv"), delim = ",", show_col_types = FALSE),
+    AppTestDataSmall = vroom::vroom(file = paste0(gh_root, "AppTestDataSmall.csv"), delim = ",", show_col_types = FALSE),
+    AppTestDataMed = vroom::vroom(file = paste0(gh_root, "AppTestDataMed.csv"), delim = ",", show_col_types = FALSE),
+    AppTestDataBig = vroom::vroom(file = paste0(gh_root, "AppTestDataBig.csv"), delim = ",", show_col_types = FALSE),
+    # FullSampleData ----
+    FullSampleData = vroom::vroom(file = paste0(gh_root, "FullSampleData.csv"), delim = ",", show_col_types = FALSE),
+    # ModBAData ----
+    ModBAData = vroom::vroom(file = paste0(gh_root, "ModBAData.csv"), delim = ",", show_col_types = FALSE),
+    # No_Interference_Dogs ----
+    No_Interference_Dogs = vroom::vroom(file = paste0(gh_root, "No_Interference_Dogs.csv"), delim = ",", show_col_types = FALSE),
+    # SEGRiskTable ----
+    SEGRiskTable = vroom::vroom(file = paste0(gh_root, "SEGRiskTable.csv"), delim = ",", show_col_types = FALSE),
+    # SampMeasData ----
+    SampMeasData = vroom::vroom(file = paste0(gh_root, "SampMeasData.csv"), delim = ",", show_col_types = FALSE),
+    # SampleData ----
+    SampleData = vroom::vroom(file = paste0(gh_root, "SampleData.csv"), delim = ",", show_col_types = FALSE),
+    # lkpRiskGrade ----
+    lkpRiskGrade = vroom::vroom(file = paste0(gh_root, "lkpRiskGrade.csv"), delim = ",", show_col_types = FALSE),
+    # lkpSEGRiskCat4 ----
+    lkpSEGRiskCat4 = vroom::vroom(file = paste0(gh_root, "lkpSEGRiskCat4.csv"), delim = ",", show_col_types = FALSE),
+    # names ----
+    names = c(
+      "VanderbiltComplete.csv", "AppRiskPairData.csv", "RiskPairData.csv", "AppLookUpRiskCat.csv", "LookUpRiskCat.csv",
+      "AppTestData.csv", "AppTestDataSmall.csv", "AppTestDataMed.csv", "AppTestDataBig.csv", "FullSampleData.csv",
+      "ModBAData.csv", "No_Interference_Dogs.csv", "SEGRiskTable.csv", "SampMeasData.csv", "SampleData.csv",
+      "lkpRiskGrade.csv", "lkpSEGRiskCat4.csv"
+    )
+  )
+}
+get_seg_data("names")

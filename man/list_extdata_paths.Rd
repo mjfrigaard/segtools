@@ -7,7 +7,7 @@
 list_extdata_paths()
 }
 \value{
-list of absolute file paths for `inst/extdata`
+list of absolute file paths for \code{inst/extdata}
 }
 \description{
 Find inst/extdata/ paths

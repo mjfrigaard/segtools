@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils.R
 \name{get_importFrom}
 \alias{get_importFrom}
-\title{Get roxygen2 tags (`@importFrom`)}
+\title{Get roxygen2 tags (\verb{@importFrom})}
 \usage{
 get_importFrom(pkg, fun = NULL)
 }
@@ -12,10 +12,10 @@ get_importFrom(pkg, fun = NULL)
 \item{fun}{string of function names}
 }
 \value{
-tags for `roxygen2`
+tags for \code{roxygen2}
 }
 \description{
-Get roxygen2 tags (`@importFrom`)
+Get roxygen2 tags (\verb{@importFrom})
 }
 \examples{
 require(bs4Dash)

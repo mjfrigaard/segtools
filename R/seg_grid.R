@@ -140,7 +140,7 @@ theme_seg <- function(base_size = 11, base_family = "Ubuntu",
 #'
 seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
 
-  risk_tbl <- seg_risk_vars(data = data, is_path = is_path)
+  risk_tbl <- seg_risk_cols(df = data)
   base_layer <- segtools::base_data |>
   ggplot(aes(
       x = x_coordinate,
