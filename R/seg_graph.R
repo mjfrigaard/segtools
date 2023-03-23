@@ -98,6 +98,6 @@ seg_graph <- function(data,
   )
 
   seg_grid +
-    theme_seg(base_size = 20)
+    theme_seg(base_size = 16)
 
 }

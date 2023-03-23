@@ -8,8 +8,6 @@ seg_modba_graph(data)
 }
 \arguments{
 \item{data}{Dataset containing only \code{BGM} and \code{REF} columns}
-
-\item{is_path}{logical, dataset or path to dataset}
 }
 \value{
 modified Bland-Altman plot

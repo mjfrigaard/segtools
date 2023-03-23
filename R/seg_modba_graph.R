@@ -1,7 +1,6 @@
 #' The SEG modified Bland-Altman plot
 #'
 #' @param data Dataset containing only `BGM` and `REF` columns
-#' @param is_path logical, dataset or path to dataset
 #'
 #' @return modified Bland-Altman plot
 #' @export seg_modba_graph
@@ -80,5 +79,5 @@ seg_modba_graph <- function(data) {
         subtitle = "Blood Glucose Monitoring Surveillance Program",
         x = "Reference (mg/dL)", y = "% Error") +
 
-    segtools::theme_seg(base_size = 18)
+    segtools::theme_seg(base_size = 16)
 }
