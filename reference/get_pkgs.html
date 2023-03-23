@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">segtools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9000</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -69,23 +69,24 @@
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">get_pkgs</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> c("R6", "RColorBrewer", "Rttf2pt1", "askpass", "base64enc", "bit", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "bit64", "brio", "bslib", "cachem", "callr", "cli", "colorspace", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "cpp11", "crayon", "curl", "desc", "diffobj", "digest", "downlit", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "dplyr", "ellipsis", "evaluate", "extrafont", "extrafontdb", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "fansi", "farver", "fastmap", "fs", "generics", "ggplot2", "glue", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "gtable", "highr", "hms", "htmltools", "httr", "isoband", "janitor", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "jquerylib", "jsonlite", "knitr", "labeling", "lifecycle", "lubridate", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "magrittr", "memoise", "mime", "munsell", "openssl", "pak", "pillar", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "pkgconfig", "pkgdown", "pkgload", "png", "praise", "prettyunits", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "processx", "progress", "ps", "purrr", "ragg", "rappdirs", "rematch2", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "renv", "rlang", "rmarkdown", "rprojroot", "sass", "scales", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "segtools", "sessioninfo", "showtext", "showtextdb", "snakecase", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "stringi", "stringr", "sys", "sysfonts", "systemfonts", "testthat", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "textshaping", "tibble", "tidyr", "tidyselect", "timechange", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "tinytex", "tzdb", "utf8", "vctrs", "viridisLite", "vroom", "waldo", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "whisker", "withr", "xfun", "xml2", "yaml", "KernSmooth", "MASS", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "Matrix", "base", "boot", "class", "cluster", "codetools", "compiler", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> c("R6", "RColorBrewer", "Rcpp", "RcppEigen", "Rttf2pt1", "askpass", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "base64enc", "bit", "bit64", "brio", "bslib", "cachem", "callr", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "cli", "colorspace", "cpp11", "crayon", "curl", "desc", "diffobj", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "digest", "downlit", "dplyr", "ellipsis", "evaluate", "extrafont", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "extrafontdb", "fansi", "farver", "fastmap", "fs", "generics", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "ggforce", "ggplot2", "glue", "gtable", "highr", "hms", "htmltools", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "httr", "isoband", "janitor", "jquerylib", "jsonlite", "knitr", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "labeling", "lifecycle", "lubridate", "magrittr", "memoise", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "mime", "munsell", "openssl", "pak", "pillar", "pkgconfig", "pkgdown", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "pkgload", "png", "polyclip", "praise", "prettyunits", "processx", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "progress", "ps", "purrr", "ragg", "rappdirs", "rematch2", "renv", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "rlang", "rmarkdown", "rprojroot", "sass", "scales", "segtools", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "sessioninfo", "showtext", "showtextdb", "snakecase", "stringi", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "stringr", "sys", "sysfonts", "systemfonts", "testthat", "textshaping", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "tibble", "tidyr", "tidyselect", "timechange", "tinytex", "tweenr", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "tzdb", "utf8", "vctrs", "viridisLite", "vroom", "waldo", "whisker", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "withr", "xfun", "xml2", "yaml", "KernSmooth", "MASS", "Matrix", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "base", "boot", "class", "cluster", "codetools", "compiler", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "datasets", "foreign", "grDevices", "graphics", "grid", "lattice", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "methods", "mgcv", "nlme", "nnet", "parallel", "rpart", "spatial", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "splines", "stats", "stats4", "survival", "tcltk", "tools", "utils"</span>
