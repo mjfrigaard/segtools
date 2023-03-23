@@ -1,4 +1,4 @@
-test_that("seg_iso_vars works", {
+test_that("seg_iso_cols works", {
   test_data <- vroom::vroom(
     system.file("extdata", "VanderbiltComplete.csv",
       package = "segtools"),
@@ -7,8 +7,8 @@ test_that("seg_iso_vars works", {
   )
   expect_equal(
     object = names(
-      segtools::seg_iso_vars(risk_cat_vars =
-          segtools::seg_risk_cat_vars(test_data))),
+      segtools::seg_iso_cols(risk_cat_vars =
+          segtools::seg_risk_cat_cols(test_data))),
     expected = c(
       "BGM",
       "REF",

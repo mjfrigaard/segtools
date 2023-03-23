@@ -136,11 +136,11 @@ theme_seg <- function(base_size = 11, base_family = "Ubuntu",
 #' @param color_var color setting
 #'
 #' @return SEG grid graph
-#' @export seg_grid
+#' @export seg_graph
 #'
-seg_grid <- function(data, is_path, alpha_var, size_var, color_var) {
+seg_graph <- function(data, is_path, alpha_var, size_var, color_var) {
 
-  risk_tbl <- seg_risk_cols(df = data)
+  risk_tbl <- seg_risk_vars(df = data)
   base_layer <- segtools::base_data |>
   ggplot(aes(
       x = x_coordinate,

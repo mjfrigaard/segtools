@@ -1,6 +1,6 @@
 #' SEG MARD table
 #'
-#' @param risk_cols output from `seg_risk_cols()`
+#' @param risk_vars output from `seg_risk_vars()`
 #'
 #' @return MARD table
 #' @export seg_mard_tbl
@@ -9,14 +9,14 @@
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' risk_cols_tbl <- seg_risk_cols(df = test_data)
+#' risk_cols_tbl <- seg_risk_vars(df = test_data)
 #' seg_mard_tbl(risk_cols_tbl)
-seg_mard_tbl <- function(risk_cols) {
+seg_mard_tbl <- function(risk_vars) {
   mard_cols <- data.frame(
-    Total = c(nrow(risk_cols)),
-    Bias = c(mean(risk_cols$rel_diff)),
-    MARD = c(mean(risk_cols$abs_rel_diff)),
-    CV = c(sd(risk_cols$rel_diff)),
+    Total = c(nrow(risk_vars)),
+    Bias = c(mean(risk_vars$rel_diff)),
+    MARD = c(mean(risk_vars$abs_rel_diff)),
+    CV = c(sd(risk_vars$rel_diff)),
     stringsAsFactors = FALSE,
     check.names = FALSE
   )

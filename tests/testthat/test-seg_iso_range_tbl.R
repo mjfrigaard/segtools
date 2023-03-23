@@ -2,7 +2,7 @@ test_that("seg_iso_range_tbl works", {
   test_data <- vroom::vroom(
                 system.file("extdata", "VanderbiltComplete.csv",
                 package = "segtools"), delim = ",", show_col_types = FALSE)
-  risk_cols_tbl <- segtools::seg_risk_cols(df = test_data)
+  risk_cols_tbl <- segtools::seg_risk_vars(df = test_data)
   app_iso_range_tbl <- tibble::tribble(
      ~ID,          ~`ISO range`,    ~N, ~Percent,
       1L,    "<= 5% or 5 mg/dL", 5328L,    "54%",

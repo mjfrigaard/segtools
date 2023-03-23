@@ -1,10 +1,10 @@
 ---
-title: "segtools"
+title: "Getting started"
 output: 
   rmarkdown::html_vignette:
     df_print: kable
 vignette: >
-  %\VignetteIndexEntry{segtools}
+  %\VignetteIndexEntry{Getting started}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -49,8 +49,6 @@ library(vroom)
 library(janitor)
 ```
 
-# Getting started 
-
 Assume I have a .csv file with BGM and REF columns (like the one in the `segtools` [`inst/extdata/`](https://github.com/mjfrigaard/segtools/tree/main/inst/extdata) folder:
 
 ```{r imported_data, message=FALSE}
@@ -83,21 +81,21 @@ knitr::kable(
 
 2. The MARD table requires two functions: 
 
-  - `seg_risk_cols()` to calculate the intermediate risk variables  
+  - `seg_risk_vars()` to calculate the intermediate risk variables  
     
 ```{r seg_risk_vars-run, eval=TRUE}
-risk_cols_tbl <- seg_risk_cols(df = test_data)
+risk_vars_tbl <- seg_risk_vars(df = test_data)
 ```
   
   - `seg_mard_tbl()` to calculate the Bias, MARD, CV, and lower/upper 95% CI 
     
 ```{r seg_mard_table-show, eval=FALSE}
-seg_mard_tbl(risk_cols_tbl)
+seg_mard_tbl(risk_vars_tbl)
 ```
 
 ```{r seg_mard_table-run, echo=FALSE}
 knitr::kable(
-seg_mard_tbl(risk_cols_tbl)
+seg_mard_tbl(risk_vars_tbl)
 )
 ```
 
@@ -106,12 +104,12 @@ seg_mard_tbl(risk_cols_tbl)
 3. `seg_risk_grade_tbl()` returns a table of risk grades 
 
 ```{r seg_risk_grade_tbl-show, eval=FALSE}
-seg_risk_grade_tbl(risk_cols_tbl)
+seg_risk_grade_tbl(risk_vars_tbl)
 ```
 
 ```{r seg_risk_grade_table-run, echo=FALSE}
 knitr::kable(
-seg_risk_grade_tbl(risk_cols_tbl)
+seg_risk_grade_tbl(risk_vars_tbl)
 )
 ```
 
@@ -120,12 +118,12 @@ seg_risk_grade_tbl(risk_cols_tbl)
 4. `seg_risk_level_table()` return a table of risk levels and categories
 
 ```{r seg_risk_cat_tbl-show, eval=FALSE}
-seg_risk_cat_tbl(risk_cols_tbl)
+seg_risk_cat_tbl(risk_vars_tbl)
 ```
 
 ```{r seg_risk_cat_tbl-run, echo=FALSE}
 knitr::kable(
-seg_risk_cat_tbl(risk_cols_tbl)
+seg_risk_cat_tbl(risk_vars_tbl)
 )
 ```
 
@@ -135,26 +133,26 @@ seg_risk_cat_tbl(risk_cols_tbl)
 5. `seg_iso_range_tbl()` returns a table of compliance ranges 
 
 ```{r seg_iso_range_table-show, eval=FALSE}
-seg_iso_range_tbl(risk_cols_tbl)
+seg_iso_range_tbl(risk_vars_tbl)
 ```
 
 ```{r seg_iso_range_table-run, echo=FALSE}
 knitr::kable(
-seg_iso_range_tbl(risk_cols_tbl)
+seg_iso_range_tbl(risk_vars_tbl)
 )
 ```
 
 ### Compliant pairs table
 
-6. `seg_binom_table()` returns a table binomial test for compliant pairs
+6. `seg_binom_tbl()` returns a table binomial test for compliant pairs
 
-```{r seg_binom_table-show, eval=FALSE}
-seg_binom_table(risk_cols_tbl)
+```{r seg_binom_tbl-show, eval=FALSE}
+seg_binom_tbl(risk_vars_tbl)
 ```
 
-```{r seg_binom_table-run, echo=FALSE}
+```{r seg_binom_tbl-run, echo=FALSE}
 knitr::kable(
-seg_binom_table(risk_cols_tbl)
+seg_binom_tbl(risk_vars_tbl)
 )
 ```
 
@@ -162,10 +160,10 @@ seg_binom_table(risk_cols_tbl)
 
 `segtools` can also create the following graphs:
 
-### The SEG grid
+### The SEG Graph
 
-```{r}
-seg_grid(
+```{r seg_graph}
+seg_graph(
   data = test_data,
   is_path = FALSE,
   alpha_var = 3 / 4,
@@ -174,8 +172,8 @@ seg_grid(
 )
 ```
 
-### The Modified Bland-Altman plot
+### The Modified Bland-Altman Plot
 
-```{r}
-seg_modba(data = test_data)
+```{r seg_modba_graph}
+seg_modba_graph(data = test_data)
 ```

@@ -10,7 +10,7 @@ library(testthat)
 library(segtools)
 
 testthat::test_file(path = "tests/testthat/test-seg_pair_type_tbl.R")
-testthat::test_file(path = "tests/testthat/test-seg_risk_cat_vars.R")
-testthat::test_file(path = "tests/testthat/test-seg_iso_vars.R")
-testthat::test_file(path = "tests/testthat/test-seg_risk_cols.R")
+testthat::test_file(path = "tests/testthat/test-seg_risk_cat_cols.R")
+testthat::test_file(path = "tests/testthat/test-seg_iso_cols.R")
+testthat::test_file(path = "tests/testthat/test-seg_risk_vars.R")
 

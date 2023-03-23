@@ -1,3 +1,13 @@
+# segtools 1.1.0
+
+* Updated functions to standardize names: 
+
+    - functions and outputs with a `_cols` suffix are intermediate/utility functions
+    - functions and outputs with a `_vars` suffix are create outputs for the primary `_tbl` and `_graph` functions   
+    - input arguments align with function names (i.e. `seg_risk_vars()` creates the output for functions with the `risk_vars` argument)
+    
+* Re-written [`risk-tables`](https://mjfrigaard.github.io/segtools/articles/risk-tables.html) vignette to be more organized.
+
 # segtools 1.0.0
 
 * Updated package functions to match shiny application outputs
@@ -13,13 +23,13 @@
     
     ℹ Testing segtools
     ✔ | F W S  OK | Context
-    ✔ |         1 | seg_binom_table [0.5s]                     
+    ✔ |         1 | seg_binom_tbl [0.5s]                     
     ✔ |         1 | seg_iso_range_tbl [0.4s]                    
-    ✔ |         1 | seg_iso_vars [0.3s]                         
+    ✔ |         1 | seg_iso_cols [0.3s]                         
     ✔ |         1 | seg_pair_type_tbl                           
     ✔ |         1 | seg_risk_cat_tbl [0.3s]                    
-    ✔ |         1 | seg_risk_cat_vars [0.3s]                   
-    ✔ |         1 | seg_risk_cols [0.6s]                       
+    ✔ |         1 | seg_risk_cat_cols [0.3s]                   
+    ✔ |         1 | seg_risk_vars [0.6s]                       
     ✔ |         1 | seg_risk_grade_tbl [0.3s]                  
     
     ══ Results ═══════════════════════════════════

@@ -2,7 +2,7 @@ test_that("seg_risk_grade_tbl works", {
   test_data <- vroom::vroom(
                 system.file("extdata", "VanderbiltComplete.csv",
                 package = "segtools"), delim = ",", show_col_types = FALSE)
-  risk_cols_tbl <- segtools::seg_risk_cols(df = test_data)
+  risk_cols_tbl <- segtools::seg_risk_vars(df = test_data)
   risk_grade_tbl <- segtools::seg_risk_grade_tbl(risk_cols_tbl)
   app_risk_grade_tbl <- as.data.frame(
   tibble::tibble(

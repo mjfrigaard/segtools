@@ -1,34 +1,34 @@
 #' Create compliant pairs table
 #'
-#' @param risk_cols output from `seg_risk_cols()`
+#' @param risk_vars output from `seg_risk_vars()`
 #'
 #' @return Binomial test table
-#' @export seg_binom_table
+#' @export seg_binom_tbl
 #'
 #' @examples
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' risk_cols_tbl <- seg_risk_cols(df = test_data)
-#' seg_binom_table(risk_cols_tbl)
-seg_binom_table <- function(risk_cols) {
+#' risk_cols_tbl <- seg_risk_vars(df = test_data)
+#' seg_binom_tbl(risk_cols_tbl)
+seg_binom_tbl <- function(risk_vars) {
 
   compliant_pairs <- tibble(`Compliant Pairs` =
-        base::nrow(risk_cols) - base::nrow(dplyr::filter(risk_cols, iso_diff > 15)))
+        base::nrow(risk_vars) - base::nrow(dplyr::filter(risk_vars, iso_diff > 15)))
 
   # calculate the percent
   compliant_pairs_perc <-
     dplyr::mutate(compliant_pairs,
       `Compliant Pairs %` =
         base::paste0(base::round(
-          100 * `Compliant Pairs` / nrow(risk_cols),
+          100 * `Compliant Pairs` / nrow(risk_vars),
           1
         ), "%")
     )
   # create probability
   prb <- 0.95
   p_value <- 0.05
-  df_size <- nrow(risk_cols)
+  df_size <- nrow(risk_vars)
   qbinom_vector <- qbinom(
     p = p_value,
     size = df_size,
@@ -40,7 +40,7 @@ seg_binom_table <- function(risk_cols) {
     qbinom_tbl <- dplyr::mutate(qbinom_tbl,
       `Lower Bound for Acceptance %` =
         base::paste0(base::round(
-          100 * `Lower Bound for Acceptance` / nrow(risk_cols),
+          100 * `Lower Bound for Acceptance` / nrow(risk_vars),
           1
         ), "%")
     )

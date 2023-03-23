@@ -1,6 +1,6 @@
 #' SEG risk grade table
 #'
-#' @param risk_cols output from `seg_risk_cols()`
+#' @param risk_vars output from `seg_risk_vars()`
 #'
 #' @return risk grade table
 #' @export seg_risk_grade_tbl
@@ -9,10 +9,10 @@
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' risk_cols_tbl <- seg_risk_cols(df = test_data)
+#' risk_cols_tbl <- seg_risk_vars(df = test_data)
 #' seg_risk_grade_tbl(risk_cols_tbl)
-seg_risk_grade_tbl <- function(risk_cols) {
-  risk_grade_cnts <- dplyr::count(risk_cols,
+seg_risk_grade_tbl <- function(risk_vars) {
+  risk_grade_cnts <- dplyr::count(risk_vars,
     risk_grade,
     sort = TRUE
   )
@@ -29,18 +29,18 @@ seg_risk_grade_tbl <- function(risk_cols) {
   )
 
   # change lkp table variables
-  dplyr::mutate(
+  risk_grade_vars_tbl <- dplyr::mutate(
     .data = risk_grade_joined,
     risk_grade_id = as.numeric(risk_grade_id),
     Percent = base::paste0(
-      base::round(n / nrow(risk_cols) * 100,
+      base::round(n / nrow(risk_vars) * 100,
         digits = 1
       ),
       if_else(condition = is.na(n),
         true = "", false = "%"
       )
     )
-  ) %>%
+  ) |>
     # rename variables
     dplyr::select(
       ID = risk_grade_id,
@@ -50,4 +50,5 @@ seg_risk_grade_tbl <- function(risk_cols) {
       # `REF Range` = REF
       `Risk Factor Range` = REF
     )
+  return(risk_grade_vars_tbl)
 }

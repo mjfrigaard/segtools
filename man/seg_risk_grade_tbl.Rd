@@ -4,10 +4,10 @@
 \alias{seg_risk_grade_tbl}
 \title{SEG risk grade table}
 \usage{
-seg_risk_grade_tbl(risk_cols)
+seg_risk_grade_tbl(risk_vars)
 }
 \arguments{
-\item{risk_cols}{output from \code{seg_risk_cols()}}
+\item{risk_vars}{output from \code{seg_risk_vars()}}
 }
 \value{
 risk grade table
@@ -19,6 +19,6 @@ SEG risk grade table
 test_data <- vroom::vroom(
                 system.file("extdata", "VanderbiltComplete.csv",
                 package = "segtools"), delim = ",")
-risk_cols_tbl <- seg_risk_cols(df = test_data)
+risk_cols_tbl <- seg_risk_vars(df = test_data)
 seg_risk_grade_tbl(risk_cols_tbl)
 }

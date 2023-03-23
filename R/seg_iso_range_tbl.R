@@ -1,6 +1,6 @@
 #' SEG iso range table
 #'
-#' @param risk_cols output from `seg_risk_cols()`
+#' @param risk_vars output from `seg_risk_vars()`
 #'
 #' @return ISO range variables
 #' @export seg_iso_range_tbl
@@ -9,9 +9,9 @@
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' risk_cols_tbl <- seg_risk_cols(df = test_data)
+#' risk_cols_tbl <- seg_risk_vars(df = test_data)
 #' seg_iso_range_tbl(risk_cols_tbl)
-seg_iso_range_tbl <- function(risk_cols) {
+seg_iso_range_tbl <- function(risk_vars) {
 
   lkpISORanges <- tibble::tribble(
        ~ID,                ~iso_range,
@@ -21,7 +21,7 @@ seg_iso_range_tbl <- function(risk_cols) {
         4L,    "> 15 - 20% mg/dL",
         5L,   "> 20% or 20 mg/dL")
 
-  iso_range_cnts <- dplyr::count(risk_cols,
+  iso_range_cnts <- dplyr::count(risk_vars,
     iso_range,
     sort = TRUE
   )
@@ -33,7 +33,7 @@ seg_iso_range_tbl <- function(risk_cols) {
   )
     iso_range_vars <- dplyr::mutate(iso_range_joined,
     Percent = base::paste0(
-      base::round(n / nrow(risk_cols) * 100,
+      base::round(n / nrow(risk_vars) * 100,
         digits = 1
       ),
       dplyr::if_else(condition = is.na(n),
@@ -44,10 +44,10 @@ seg_iso_range_tbl <- function(risk_cols) {
   ) |>
     dplyr::arrange(desc(n))
 
-  iso_range_tbl <- dplyr::select(iso_range_vars, ID,
+  iso_range_vars_tbl <- dplyr::select(iso_range_vars, ID,
     `ISO range` = iso_range,
     N = n,
     Percent
   )
-  return(iso_range_tbl)
+  return(iso_range_vars_tbl)
 }

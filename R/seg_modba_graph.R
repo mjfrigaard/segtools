@@ -4,7 +4,7 @@
 #' @param is_path logical, dataset or path to dataset
 #'
 #' @return modified Bland-Altman plot
-#' @export seg_modba
+#' @export seg_modba_graph
 #'
 #' @examples
 #' require(vroom)
@@ -12,11 +12,11 @@
 #'  file =
 #'    system.file("extdata", "VanderbiltComplete.csv",
 #'                package = "segtools"), delim = ",")
-#' seg_modba(data = vanderbilt_complete, is_path = FALSE)
+#' seg_modba_graph(data = vanderbilt_complete, is_path = FALSE)
 
-seg_modba <- function(data) {
+seg_modba_graph <- function(data) {
 
-  risk_tbl <- seg_risk_cols(df = data)
+  risk_tbl <- seg_risk_vars(df = data)
 
       # calculate LN of REF and BGM -----
 

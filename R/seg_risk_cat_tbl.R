@@ -1,6 +1,6 @@
 #' SEG risk category table
 #'
-#' @param risk_cols output from `seg_risk_cols()`
+#' @param risk_vars output from `seg_risk_vars()`
 #'
 #' @return risk cat variable table
 #' @export seg_risk_cat_tbl
@@ -9,11 +9,11 @@
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' risk_cols_tbl <- seg_risk_cols(df = test_data)
+#' risk_cols_tbl <- seg_risk_vars(df = test_data)
 #' seg_risk_cat_tbl(risk_cols_tbl)
-seg_risk_cat_tbl <- function(risk_cols) {
+seg_risk_cat_tbl <- function(risk_vars) {
   # count risk cats
-  risk_cat_cnts <- dplyr::count(risk_cols,
+  risk_cat_cnts <- dplyr::count(risk_vars,
     risk_cat,
     sort = TRUE
   )
@@ -45,7 +45,7 @@ seg_risk_cat_tbl <- function(risk_cols) {
     risk_cat_joined,
     risk_cat = as.numeric(risk_cat),
     Percent = base::paste0(
-      base::round(n / nrow(risk_cols) * 100,
+      base::round(n / nrow(risk_vars) * 100,
         digits = 1
       ),
       if_else(
@@ -57,11 +57,11 @@ seg_risk_cat_tbl <- function(risk_cols) {
   ) |>
     dplyr::arrange(desc(n))
 
-  risk_cat_vars <- dplyr::select(risk_cat_cols,
+  risk_cat_vars_tbl <- dplyr::select(risk_cat_cols,
     `SEG Risk Level` = risk_cat,
     `SEG Risk Category` = risk_cat_txt,
     `Number of Pairs` = n,
     Percent
   )
-  return(risk_cat_vars)
+  return(risk_cat_vars_tbl)
 }

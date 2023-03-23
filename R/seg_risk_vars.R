@@ -2,15 +2,15 @@
 #'
 #' @param df data with `BGM` and `REF` columns
 #'
-#' @return seg risk category variable table
-#' @export seg_risk_cat_vars
+#' @return seg risk category columns table
+#' @export seg_risk_cat_cols
 #'
 #' @examples
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' seg_risk_cat_vars(test_data)
-  seg_risk_cat_vars <- function(df) {
+#' seg_risk_cat_cols(test_data)
+seg_risk_cat_cols <- function(df) {
     LookUpRiskCat <- data.frame(
       risk_cat = c(0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L),
       ABSLB = c(-0.001, 0.5, 1, 1.5, 2, 2.5, 3, 3.5),
@@ -72,7 +72,7 @@
       by = "risk_cat"
     )
     # create text risk categories ----
-    seg_risk_cat_vars_tbl <- dplyr::mutate(risk_cat_join_tbl,
+    seg_risk_cat_cols_tbl <- dplyr::mutate(risk_cat_join_tbl,
       risk_cat_txt =
         dplyr::case_when(
           abs_risk < 0.5 ~ "None",
@@ -85,24 +85,24 @@
           abs_risk > 3.5 ~ "Extreme"
         )
     )
-    return(seg_risk_cat_vars_tbl)
+    return(seg_risk_cat_cols_tbl)
   }
 
 #' Title
 #'
-#' @param risk_cat_vars output from `seg_risk_cat_vars()`
+#' @param risk_cat_cols output from `seg_risk_cat_cols()`
 #'
 #' @return ISO range variable table
-#' @export seg_iso_vars
+#' @export seg_iso_cols
 #'
 #' @examples
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' risk_cat_tbl <- seg_risk_cat_vars(test_data)
-#' seg_iso_vars(risk_cat_vars = risk_cat_tbl)
-seg_iso_vars <- function(risk_cat_vars) {
-  iso_vars_tbl <- dplyr::mutate(risk_cat_vars,
+#' risk_cat_tbl <- seg_risk_cat_cols(test_data)
+#' seg_iso_cols(risk_cat_cols = risk_cat_tbl)
+seg_iso_cols <- function(risk_cat_cols) {
+  iso_cols_tbl <- dplyr::mutate(risk_cat_cols,
     rel_diff = (BGM - REF) / REF, # relative diff
     abs_rel_diff = abs(rel_diff), # abs relative diff
     sq_rel_diff = rel_diff^2,
@@ -138,7 +138,7 @@ seg_iso_vars <- function(risk_cat_vars) {
       abs_risk >= 3.5 ~ "> 3.5"
     )
   )
-  return(iso_vars_tbl)
+  return(iso_cols_tbl)
 }
 
 #' SEG risk columns (wrapper function)
@@ -146,18 +146,18 @@ seg_iso_vars <- function(risk_cat_vars) {
 #' @param df data with `BGM` and `REF` columns
 #'
 #' @return SEG risk columns
-#' @export seg_risk_cols
+#' @export seg_risk_vars
 #'
 #' @examples
 #' test_data <- vroom::vroom(
 #'                 system.file("extdata", "VanderbiltComplete.csv",
 #'                 package = "segtools"), delim = ",")
-#' seg_risk_cols(df = test_data)
-seg_risk_cols <- function(df) {
+#' seg_risk_vars(df = test_data)
+seg_risk_vars <- function(df) {
 
-  risk_cat_vars_tbl <- seg_risk_cat_vars(df = df)
+  risk_cat_vars_tbl <- seg_risk_cat_cols(df = df)
 
-  iso_vars_tbl <- seg_iso_vars(risk_cat_vars = risk_cat_vars_tbl)
+  iso_vars_tbl <- seg_iso_cols(risk_cat_cols = risk_cat_vars_tbl)
 
   return(iso_vars_tbl)
 }
