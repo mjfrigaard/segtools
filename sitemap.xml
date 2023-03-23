@@ -49,37 +49,37 @@
     <loc>https://mjfrigaard.github.io/segtools/reference/rgb2hex.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_binom_table.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_binom_tbl.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_grid.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_graph.html</loc>
+  </url>
+  <url>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_iso_cols.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_iso_range_tbl.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_iso_vars.html</loc>
-  </url>
-  <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_mard_tbl.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_modba.html</loc>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_modba_graph.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_pair_type_tbl.html</loc>
   </url>
   <url>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cat_cols.html</loc>
+  </url>
+  <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cat_tbl.html</loc>
   </url>
   <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cat_vars.html</loc>
-  </url>
-  <url>
-    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_cols.html</loc>
-  </url>
-  <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_grade_tbl.html</loc>
+  </url>
+  <url>
+    <loc>https://mjfrigaard.github.io/segtools/reference/seg_risk_vars.html</loc>
   </url>
   <url>
     <loc>https://mjfrigaard.github.io/segtools/reference/theme_seg.html</loc>

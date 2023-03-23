@@ -49,6 +49,16 @@
     </div>
 
     <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.1.0" id="segtools-110">segtools 1.1.0<a class="anchor" aria-label="anchor" href="#segtools-110"></a></h2>
+<ul><li>
+<p>Updated functions to standardize names:</p>
+<ul><li>functions and outputs with a <code>_cols</code> suffix are intermediate/utility functions</li>
+<li>functions and outputs with a <code>_vars</code> suffix are create outputs for the primary <code>_tbl</code> and <code>_graph</code> functions<br></li>
+<li>input arguments align with function names (i.e. <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code> creates the output for functions with the <code>risk_vars</code> argument)</li>
+</ul></li>
+<li><p>Re-written <a href="https://mjfrigaard.github.io/segtools/articles/risk-tables.html"><code>risk-tables</code></a> vignette to be more organized.</p></li>
+</ul></div>
+    <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.0" id="segtools-100">segtools 1.0.0<a class="anchor" aria-label="anchor" href="#segtools-100"></a></h2>
 <ul><li>
 <p>Updated package functions to match shiny application outputs</p>
@@ -62,13 +72,13 @@
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">ℹ</span> Testing segtools</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span> <span class="ex">F</span> W S  OK <span class="kw">|</span> <span class="ex">Context</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_binom_table</span> [0.5s]                     </span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_binom_tbl</span> [0.5s]                     </span>
 <span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_iso_range_tbl</span> [0.4s]                    </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_iso_vars</span> [0.3s]                         </span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_iso_cols</span> [0.3s]                         </span>
 <span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_pair_type_tbl</span>                           </span>
 <span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_risk_cat_tbl</span> [0.3s]                    </span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_risk_cat_vars</span> [0.3s]                   </span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_risk_cols</span> [0.6s]                       </span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_risk_cat_cols</span> [0.3s]                   </span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_risk_vars</span> [0.6s]                       </span>
 <span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">✔</span> <span class="kw">|</span>         <span class="ex">1</span> <span class="kw">|</span> <span class="ex">seg_risk_grade_tbl</span> [0.3s]                  </span>
 <span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">══</span> Results ═══════════════════════════════════</span>
