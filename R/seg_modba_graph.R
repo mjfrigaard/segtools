@@ -34,44 +34,51 @@ seg_modba_graph <- function(data) {
 
       # create points layer -----
       ggplot2::ggplot(data = ln_risk_tbl,
-        mapping = aes(x = REF,
-                          y = rel_perc_diff)) +
+        mapping = ggplot2::aes(x = REF, y = rel_perc_diff)) +
 
-      ggplot2::geom_point(alpha = 0.5, color = "royalblue") +
+      ggplot2::geom_point(
+        alpha = 1.0,
+        size = 2.5,
+        shape = 21,
+        fill = "#FFFFFF",
+        color = "#005b96") +
+
+        ggplot2::geom_point(
+        alpha = 1.0,
+        shape = 21,
+        size = 1.88,
+        color = "#def3f6", #03396c
+        fill = "#03396c") +
 
       ggplot2::scale_y_continuous(
-
-        name = "% Error",
-
         limits = c(-0.50, 0.50)
-
       ) +
 
-      # use segtools::seg_bland_altman_ref_vals -----
-
-      ggplot2::geom_line(aes(x = Ref, y = UB),
-
+      ggplot2::geom_line(
+        ggplot2::aes(x = Ref, y = UB),
         data = segtools::APPSEGBlandAltmanRefVals,
-
-        linetype = "1111",
-
-        color = "red",
-
-        linewidth = 2.5
-
+        linetype = "dotted",
+        lineend = "round",
+        linejoin = "round",
+        color = "#ce2b37",
+        linewidth = 2.2,
+        alpha = 0.85
       ) +
 
-      ggplot2::geom_line(aes(x = Ref, y = LB),
-
+      ggplot2::geom_line(
+        ggplot2::aes(x = Ref, y = LB),
         data = segtools::APPSEGBlandAltmanRefVals,
-
-        linetype = "1111",
-
-        color = "red",
-
-        linewidth = 2.5
-
+        linetype = "dotted",
+        lineend = "round",
+        linejoin = "round",
+        color = "#ce2b37",
+        linewidth = 2.2,
+        alpha = 0.85
       ) +
 
-    segtools::theme_seg()
+    ggplot2::labs(title = "Modified Bland–Altman Plot",
+        subtitle = "Blood Glucose Monitoring Surveillance Program",
+        x = "Reference (mg/dL)", y = "% Error") +
+
+    segtools::theme_seg(base_size = 18)
 }

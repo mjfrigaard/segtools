@@ -8,6 +8,11 @@
 #' @importFrom tibble as_tibble
 #'
 #' @export import_flat_file
+#'
+#' @examples
+#' test_data <- import_flat_file(system.file("extdata", "VanderbiltComplete.csv",
+#'                               package = "segtools"))
+#'
 import_flat_file <- function(path) {
   ext <- tools::file_ext(path)
   data <- switch(ext,

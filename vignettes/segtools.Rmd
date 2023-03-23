@@ -175,5 +175,6 @@ seg_graph(
 ### The Modified Bland-Altman Plot
 
 ```{r seg_modba_graph}
+source("../R/seg_modba_graph.R")
 seg_modba_graph(data = test_data)
 ```

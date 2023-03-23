@@ -6,9 +6,9 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-`segtools` provides the underlying functions and calculations for the
-[SURVEILLANCE ERROR GRID
-(SEG)](https://www.diabetestechnology.org/seg.shtml)
+`segtools` provides the underlying functions and calculations for [The
+Surveillance Error Grid](https://www.diabetestechnology.org/seg.shtml)
+shiny application.
 
 ## Installation
 
@@ -16,9 +16,18 @@ You can install the development version of `segtools` from
 [GitHub](https://github.com/) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("mjfrigaard/segtools")
+# install.packages("remotes")
+remotes::install_github("mjfrigaard/segtools")
 ```
+
+## Previous work
+
+The previous shiny applications are stored in the [Quesgen GitHub
+repositories](https://github.com/quesgen):
+
+- [Version 1.3.2](https://github.com/quesgen/seg-shiny-1-3-2)
+
+- [Version 1.3.3](https://github.com/quesgen/seg-shiny-1-3-3)
 
 ## SEG Graph
 
@@ -30,15 +39,11 @@ library(vroom)
 # import data
 test_data <- vroom::vroom(
   file =
-    system.file("extdata", "AppTestData.csv",
+    system.file("extdata", "VanderbiltComplete.csv",
         package = "segtools"), delim = ",")
 # plot
-segtools::seg_grid(
-  data = test_data,
-  is_path = FALSE,
-  alpha_var = 3 / 4,
-  size_var = 2.5,
-  color_var = "gray85"
+segtools::seg_graph(
+  data = test_data
 )
 ```
 

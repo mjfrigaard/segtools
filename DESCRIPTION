@@ -12,6 +12,7 @@ Roxygen: list(markdown = TRUE)
 Imports: 
     extrafont,
     ggplot2,
+    ggforce,
     janitor,
     png,
     purrr,

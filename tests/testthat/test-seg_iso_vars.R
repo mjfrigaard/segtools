@@ -7,7 +7,7 @@ test_that("seg_iso_cols works", {
   )
   expect_equal(
     object = names(
-      segtools::seg_iso_cols(risk_cat_vars =
+      segtools::seg_iso_cols(risk_cat_cols =
           segtools::seg_risk_cat_cols(test_data))),
     expected = c(
       "BGM",

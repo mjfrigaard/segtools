@@ -1,3 +1,46 @@
+
+# segtools 1.1.1
+
+* New tests for `import_flat_file()`
+
+    ```bash
+    ==> devtools::test()
+    
+    ℹ Testing segtools
+    ✔ | F W S  OK | Context
+    ✔ |         3 | import_flat_file [0.2s]                                                                     
+    ✔ |         1 | seg_binom_table [0.5s]                                                                      
+    ✔ |         1 | seg_iso_range_tbl [0.6s]                                                                    
+    ✔ |         1 | seg_iso_vars [0.4s]                                                                       
+    ✔ |         1 | seg_pair_type_tbl [0.1s]                                                                    
+    ✔ |         1 | seg_risk_cat_tbl [0.4s]                                                                     
+    ✔ |         1 | seg_risk_cat_vars [0.2s]                                                                    
+    ✔ |         1 | seg_risk_cols [0.7s]                                                                        
+    ✔ |         1 | seg_risk_grade_tbl [0.4s]                                                                      
+    
+    ══ Results ══════════════════════════════════════════════════════════════════
+    Duration: 3.7 s
+    
+    [ FAIL 0 | WARN 0 | SKIP 0 | PASS 11 ]
+    ```
+    
+## Graphs 
+    
+* Updated `seg_modba_graph.R`   
+
+  - Now includes a fill *and* color var input (using shape `21`)  
+  
+  - Text size increased for better web rendering 
+
+* Updated `seg_graph.R`  
+
+  - New points and lines with higher contrast colors  
+  
+  - Axis titles added  
+  
+  - Text size increased for better web rendering 
+
+
 # segtools 1.1.0
 
 * Updated functions to standardize names: 

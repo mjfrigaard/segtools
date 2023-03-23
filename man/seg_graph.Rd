@@ -21,7 +21,7 @@ seg_graph(
 
 \item{color_var}{color setting}
 
-\item{is_path}{logical, dataset or path to dataset}
+\item{fill_var}{fill setting}
 }
 \value{
 SEG grid graph
