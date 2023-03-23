@@ -4,18 +4,24 @@
 \alias{seg_graph}
 \title{ggplot2 function for SEG grid}
 \usage{
-seg_graph(data, is_path, alpha_var, size_var, color_var)
+seg_graph(
+  data,
+  alpha_var = 0.6,
+  size_var = 2.3,
+  color_var = "#000000",
+  fill_var = "#FFFFFF"
+)
 }
 \arguments{
 \item{data}{Dataset containing only \code{BGM} and \code{REF} columns}
-
-\item{is_path}{logical, dataset or path to dataset}
 
 \item{alpha_var}{alpha setting}
 
 \item{size_var}{size setting}
 
 \item{color_var}{color setting}
+
+\item{is_path}{logical, dataset or path to dataset}
 }
 \value{
 SEG grid graph

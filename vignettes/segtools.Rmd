@@ -165,10 +165,10 @@ seg_binom_tbl(risk_vars_tbl)
 ```{r seg_graph}
 seg_graph(
   data = test_data,
-  is_path = FALSE,
   alpha_var = 3 / 4,
   size_var = 2.5,
-  color_var = "gray85"
+  color_var = "#000000",
+  fill_var = "#FFFFFF"
 )
 ```
 

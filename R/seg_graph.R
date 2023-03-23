@@ -138,9 +138,14 @@ theme_seg <- function(base_size = 11, base_family = "Ubuntu",
 #' @return SEG grid graph
 #' @export seg_graph
 #'
-seg_graph <- function(data, is_path, alpha_var, size_var, color_var) {
+seg_graph <- function(data,
+                      alpha_var = 0.6,
+                      size_var = 2.3,
+                      color_var = "#000000",
+                      fill_var = "#FFFFFF") {
 
   risk_tbl <- seg_risk_vars(df = data)
+
   base_layer <- segtools::base_data |>
   ggplot(aes(
       x = x_coordinate,
@@ -214,9 +219,9 @@ seg_graph <- function(data, is_path, alpha_var, size_var, color_var) {
       y = BGM
     ),
     shape = 21,
-    color = "white",
+    color = color_var,
     size = size_var,
-    fill = color_var,
+    fill = fill_var,
     alpha = alpha_var,
     stroke = 0.4
   )

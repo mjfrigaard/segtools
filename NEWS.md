@@ -8,6 +8,8 @@
     
 * Re-written [`risk-tables`](https://mjfrigaard.github.io/segtools/articles/risk-tables.html) vignette to be more organized.
 
+* Added [SEG Graph vignette](https://mjfrigaard.github.io/segtools/articles/seg-graph.html) 
+
 # segtools 1.0.0
 
 * Updated package functions to match shiny application outputs
