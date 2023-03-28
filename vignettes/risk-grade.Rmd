@@ -1,0 +1,210 @@
+---
+title: "Risk Grades"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{Risk Grades}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+always_allow_html: true
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(vroom)
+library(janitor)
+library(waldo)
+library(diffobj)
+```
+
+The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+
+This vignette covers the development of the risk grade table function and look-up table, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+
+
+## Load test data
+
+The `segtools` package uses [`testthat`](https://testthat.r-lib.org), a common testing framework for performing unit tests. I'll load a test data file used in [the GitHub repo](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL58-L58C47) (`VanderbiltComplete.csv`) below and run it in the shiny app to generate the tables for comparison.
+
+```{r test_vand_comp_data}
+github_data_root <-
+  "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+full_sample_repo <- base::paste0(github_data_root,
+  "VanderbiltComplete.csv")
+test_vand_comp_data <-
+  vroom::vroom(file = full_sample_repo, delim = ",")
+glimpse(test_vand_comp_data)
+```
+
+# Application (version 1.3.3) functions 
+
+Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+
+# SEG Risk Variables 
+
+Create the `risk_vars_tbl` from `seg_risk_vars()`:
+
+```{r risk_vars_tbl}
+risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
+dplyr::glimpse(risk_vars_tbl)
+```
+
+# Risk Grade Table
+
+The [`RiskGradeTable3`](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L728) is also created in the server, which I've wrapped into a function: 
+
+```{r seg_risk_grade_tbl}
+seg_risk_grade_tbl <- function(risk_vars) {
+  risk_grade_cnts <- dplyr::count(risk_vars,
+    risk_grade,
+    sort = TRUE
+  )
+
+  lkpRiskGrade <- tibble::tibble(
+      risk_grade_id = c(1, 2, 3, 4, 5),
+      risk_grade = c("A", "B", "C", "D", "E"),
+      REF = c("0 - 0.5", "> 0.5 - 1.0", "> 1.0 - 2.0", "> 2.0 - 3.0", "> 3.0"))
+  
+  risk_grade_joined <- dplyr::full_join(
+    x = risk_grade_cnts,
+    y = lkpRiskGrade,
+    by = "risk_grade"
+  )
+
+  # change lkp table variables
+  risk_grade_vars_tbl <- dplyr::mutate(
+    .data = risk_grade_joined,
+    risk_grade_id = as.numeric(risk_grade_id),
+    Percent = base::paste0(
+      base::round(n / nrow(risk_vars) * 100,
+        digits = 1
+      ),
+      if_else(condition = is.na(n),
+        true = "", false = "%"
+      )
+    )
+  ) |> 
+    # rename variables
+    dplyr::select(
+      ID = risk_grade_id,
+      `Risk Grade` = risk_grade,
+      `Number of Pairs` = n,
+      Percent,
+      # `REF Range` = REF
+      `Risk Factor Range` = REF
+    )
+  
+  return(risk_grade_vars_tbl)
+}
+```
+
+```{r test-seg_risk_grade_tbl-show, eval=FALSE}
+seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
+```
+
+```{r test-seg_risk_grade_tbl-run, echo=FALSE}
+knitr::kable(
+  seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
+)
+```
+
+I'll compare this to the application output below:
+
+### Application `RiskGradeTable` 
+
+```{r vand_comp_risk_grade-png, echo=FALSE}
+knitr::include_graphics(path = "../man/figures/vand_comp_risk_grade.png")
+```
+
+But I can build it manually and wrap the output `tibble` in the `data.frame`).
+
+```{r app_risk_grade_tbl}
+app_risk_grade_tbl <- as.data.frame(
+  tibble::tibble(
+    ID = c(1L, 2L, 3L, 4L, 5L),
+    `Risk Grade` = c('A', 'B', 'C', 'D', 'E'),
+    `Number of Pairs` = c(9474L, 349L, 35L, 10L, NA_integer_),
+    Percent = c('96%', '3.5%', '0.4%', '0.1%', NA_character_),
+    `Risk Factor Range` = c('0 - 0.5', '> 0.5 - 1.5', '> 1.5 - 2.5',
+      '> 2.5 - 3.5', '> 3.5'),
+  )
+)
+```
+
+```{r show-app_risk_grade_tbl, eval=FALSE}
+app_risk_grade_tbl
+```
+
+```{r run-app_risk_grade_tbl, echo=FALSE}
+knitr::kable(app_risk_grade_tbl)
+```
+
+# Test
+
+Now I test the `seg_risk_vars()` and `seg_risk_grade_tbl()` functions:
+
+```{r re-check-seg_risk_vars}
+risk_grade_tbl <- seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
+risk_grade_tbl
+```
+
+The risk grade table doesn't necessarily require that we test the entire table structure--we can focus on the specific columns we care about in the output (like `Number of Pairs`)
+
+`testthat::expect_equal()` uses the `waldo` package to make comparisons, so I'll use that first here to check the `Number of Pairs` columns:
+
+```{r , eval=TRUE}
+waldo::compare(
+  x = risk_grade_tbl$`Number of Pairs`, 
+  y = app_risk_grade_tbl$`Number of Pairs`
+)
+```
+
+
+Now we can formally test the columns using `testthat::expect_equal()` and limit testing to only the `Number of Pairs` column:
+
+```{r , eval=TRUE}
+testthat::test_that("Test risk grade table", {
+testthat::expect_equal(
+  # function table
+  object = risk_grade_tbl$`Number of Pairs`, 
+  # application table
+  expected = app_risk_grade_tbl$`Number of Pairs`
+  )
+})
+```

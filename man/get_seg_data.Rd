@@ -9,3 +9,6 @@ get_seg_data(data)
 \description{
 SEG data switch
 }
+\examples{
+get_seg_data("names")
+}

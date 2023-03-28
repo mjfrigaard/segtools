@@ -1,0 +1,200 @@
+---
+title: "Risk Grades"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{Risk Grades}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+always_allow_html: true
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(vroom)
+library(janitor)
+library(waldo)
+library(diffobj)
+```
+
+The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+
+This vignette covers the development of the MARD table function, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+
+
+## Load test data
+
+The `segtools` package uses [`testthat`](https://testthat.r-lib.org), a common testing framework for performing unit tests. I'll load a test data file used in [the GitHub repo](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL58-L58C47) (`VanderbiltComplete.csv`) below and run it in the shiny app to generate the tables for comparison.
+
+```{r test_vand_comp_data}
+github_data_root <-
+  "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+full_sample_repo <- base::paste0(github_data_root,
+  "VanderbiltComplete.csv")
+test_vand_comp_data <-
+  vroom::vroom(file = full_sample_repo, delim = ",")
+glimpse(test_vand_comp_data)
+```
+
+# Application (version 1.3.3) functions 
+
+Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+
+# SEG Risk Variables 
+
+Create the `risk_vars_tbl` from `seg_risk_vars()`:
+
+```{r risk_vars_tbl}
+risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
+dplyr::glimpse(risk_vars_tbl)
+```
+
+## MARD Table 
+
+The `MARDTable` is created in the server function of the application, starting [here](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L669). 
+
+I've converted it into a function, `seg_mard_tbl()`, which takes the output from `seg_risk_vars()`: 
+
+### `seg_mard_tbl()`
+
+```{r seg_mard_tbl}
+seg_mard_tbl <- function(risk_vars) {
+  mard_cols <- data.frame(
+    Total = c(nrow(risk_vars)),
+    Bias = c(mean(risk_vars$rel_diff)),
+    MARD = c(mean(risk_vars$abs_rel_diff)),
+    CV = c(sd(risk_vars$rel_diff)),
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  lower_tbl <- tibble::add_column(
+    .data = mard_cols,
+    `Lower 95% Limit of Agreement` = mard_cols$Bias - 1.96 * mard_cols$CV
+  )
+  upper_tbl <- tibble::add_column(
+    .data = lower_tbl,
+    `Upper 95% Limit of Agreement` = mard_cols$Bias + 1.96 * mard_cols$CV
+  )
+  mard_vars <- dplyr::mutate(
+    .data = upper_tbl,
+    Bias = base::paste0(base::round(
+      100 * Bias,
+      digits = 1
+    ), "%"),
+    MARD = base::paste0(base::round(
+      100 * MARD,
+      digits = 1
+    ), "%"),
+    CV = base::paste0(base::round(
+      100 * CV,
+      digits = 1
+    ), "%"),
+    `Lower 95% Limit of Agreement` = base::paste0(base::round(
+      100 * `Lower 95% Limit of Agreement`,
+      digits = 1
+    ), "%"),
+    `Upper 95% Limit of Agreement` = base::paste0(base::round(
+      100 * `Upper 95% Limit of Agreement`,
+      digits = 1
+    ), "%")
+  )
+  mard_vars_tbl <- tibble::as_tibble(mard_vars)
+  return(mard_vars_tbl)
+}
+```
+
+Below I test the `seg_mard_tbl()` function 
+
+```{r test-seg_mard_tbl-show, eval=FALSE}
+seg_mard_tbl(risk_vars = risk_vars_tbl)
+```
+
+```{r test-seg_mard_tbl-run, echo=FALSE}
+knitr::kable(
+  seg_mard_tbl(risk_vars = risk_vars_tbl)
+)
+```
+
+### Application `MARDTable` 
+
+The MARD table from the application is below: 
+
+```{r vand_comp_mard, echo=FALSE, fig.align='center'}
+knitr::include_graphics(path = "../man/figures/vand_comp_mard.png")
+```
+
+Once again, I will store the app's MARD table into and object I can test using `datapasta::tribble_paste()` (as `app_mard_tbl`).
+
+```{r show-print-app_mard_tbl, eval=FALSE}
+app_mard_tbl <- tibble::tibble(
+    Total = 9868L,
+    Bias = "0.6%",
+    MARD = "7%",
+    CV = "14.8%",
+    `Lower 95% Limit of Agreement` = "-28.3%",
+    `Upper 95% Limit of Agreement` = "29.6%")
+app_mard_tbl
+```
+
+```{r kable-print-app_mard_tbl, echo=FALSE}
+app_mard_tbl <- tibble::tibble(
+    Total = 9868L,
+    Bias = "0.6%",
+    MARD = "7%",
+    CV = "14.8%",
+    `Lower 95% Limit of Agreement` = "-28.3%",
+    `Upper 95% Limit of Agreement` = "29.6%")
+knitr::kable(app_mard_tbl)
+```
+
+## Test 
+
+Below I test both MARD tables using `testthat::expect_equal()` again:
+
+```{r}
+testthat::test_that("Test MARD table values", {
+testthat::expect_equal(
+  # function table
+  object = seg_mard_tbl(risk_vars = risk_vars_tbl),
+  # application table
+  expected = app_mard_tbl
+  )
+})
+```

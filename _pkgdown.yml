@@ -14,3 +14,62 @@ template:
     code_font:
       google: Ubuntu Mono
 
+reference:
+- title: "SEG tools"
+  desc: >
+    Functions for creating SEG table variables
+  contents:
+  - seg_risk_cat_cols
+  - seg_iso_cols
+  - seg_risk_vars
+- title: "SEG Tables"
+  desc: "Functions for creating output tabels"
+  contents:
+  - ends_with("_tbl")
+- title: "SEG Graphs"
+  desc: "Functions for creating output graphs"
+  contents:
+  - seg_graph
+  - seg_modba_graph
+  - theme_seg
+- title: "Utilities"
+  desc: "Helper functions"
+  contents:
+  - list_extdata_paths
+  - get_extdata
+  - rgb2hex
+  - get_importFrom
+  - get_pkgs
+  - get_seg_data
+  - import_flat_file
+
+navbar:
+ components:
+   articles:
+    text: Articles
+    menu:
+    - text: Getting started
+    - text: Start
+      href: articles/segtools.html
+    - text: -------
+    - text: "Tabels"
+    - text: Risk Variables
+      href: articles/risk-vars.html
+    - text: Pair types
+      href: articles/pair-types.html
+    - text: MARD
+      href: articles/mard.html
+    - text: Risk Grade
+      href: articles/risk-grade.html
+    - text: Risk Categories
+      href: articles/risk-categories.html
+    - text: ISO Ranges
+      href: articles/iso-ranges.html
+    - text: Compliant Pairs
+      href: articles/compliant-pairs.html
+    - text: -------
+    - text: "Graphs"
+    - text: Surveillance Error Grid
+      href: articles/seg-graph.html
+    - text: Modified Bland-Altman Plot
+      href: articles/modba.html

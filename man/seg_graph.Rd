@@ -6,6 +6,7 @@
 \usage{
 seg_graph(
   data,
+  text_size = 14,
   alpha_var = 0.6,
   size_var = 2.3,
   color_var = "#000000",
@@ -28,4 +29,12 @@ SEG grid graph
 }
 \description{
 ggplot2 function for SEG grid
+}
+\examples{
+require(vroom)
+vanderbilt_complete <- vroom::vroom(
+ file =
+   system.file("extdata", "VanderbiltComplete.csv",
+               package = "segtools"), delim = ",")
+seg_graph(vanderbilt_complete)
 }

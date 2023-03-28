@@ -1,6 +1,7 @@
 #' The SEG modified Bland-Altman plot
 #'
 #' @param data Dataset containing only `BGM` and `REF` columns
+#' @param text_size base size passed to `theme_seg()`
 #'
 #' @return modified Bland-Altman plot
 #' @export seg_modba_graph
@@ -11,9 +12,9 @@
 #'  file =
 #'    system.file("extdata", "VanderbiltComplete.csv",
 #'                package = "segtools"), delim = ",")
-#' seg_modba_graph(data = vanderbilt_complete, is_path = FALSE)
+#' seg_modba_graph(data = vanderbilt_complete)
 
-seg_modba_graph <- function(data) {
+seg_modba_graph <- function(data, text_size = 16) {
 
   risk_tbl <- seg_risk_vars(df = data)
 
@@ -79,5 +80,5 @@ seg_modba_graph <- function(data) {
         subtitle = "Blood Glucose Monitoring Surveillance Program",
         x = "Reference (mg/dL)", y = "% Error") +
 
-    segtools::theme_seg(base_size = 16)
+    segtools::theme_seg(base_size = text_size)
 }

@@ -11,13 +11,17 @@ vignette: >
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "../man/figures/",
+  dev = "ragg_png",
+  dpi = 320,
+  fig.asp = 0.718,
+  # fig.asp = 0.618,
+  fig.retina = 0.4,
   out.width = "100%",
+  fig.width = 8,
+  fig.path = "../man/figures/",
   eval = TRUE,
   warning = FALSE,
-  message = FALSE,
-  fig.width = 8,
-  fig.height = 6
+  message = FALSE
 )
 # colourpicker install
 # devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
@@ -74,10 +78,11 @@ There are also four optional aesthetic arguments:
 ```{r seg_graph-args}
 seg_graph(
   data = FullSampleData, 
+  text_size = 16,
   alpha_var = 3/4,
   size_var = 3, 
-  color_var = "#03396c", 
-  fill_var = "#BBEEFF")
+  color_var = "#4D4D4D", 
+  fill_var = "#FFFFFF")
 ```
 
 

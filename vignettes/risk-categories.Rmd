@@ -1,0 +1,211 @@
+---
+title: "Risk Categories"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{Risk Categories}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+always_allow_html: true
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(vroom)
+library(janitor)
+library(waldo)
+library(diffobj)
+```
+
+The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+
+This vignette covers the development of the risk category table function, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+
+
+## Load test data
+
+The `segtools` package uses [`testthat`](https://testthat.r-lib.org), a common testing framework for performing unit tests. I'll load a test data file used in [the GitHub repo](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL58-L58C47) (`VanderbiltComplete.csv`) below and run it in the shiny app to generate the tables for comparison.
+
+```{r test_vand_comp_data}
+github_data_root <-
+  "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+full_sample_repo <- base::paste0(github_data_root,
+  "VanderbiltComplete.csv")
+test_vand_comp_data <-
+  vroom::vroom(file = full_sample_repo, delim = ",")
+glimpse(test_vand_comp_data)
+```
+
+# Application (version 1.3.3) functions 
+
+Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+
+# SEG Risk Variables 
+
+Create the `risk_vars_tbl` from `seg_risk_vars()`:
+
+```{r risk_vars_tbl}
+risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
+dplyr::glimpse(risk_vars_tbl)
+```
+
+
+# Risk Category Table 
+
+The [SEGRiskCategoryTable4](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L779) table is created in the app `server` function, and I've re-written it below as `seg_risk_cat_tbl(risk_vars = )`
+
+## `seg_risk_cat_tbl()`
+
+```{r seg_risk_cat_tbl}
+seg_risk_cat_tbl <- function(risk_vars) {
+  # count risk cats
+risk_cat_cnts <- dplyr::count(risk_vars,
+  risk_cat,
+  sort = TRUE
+)
+
+# define lkpSEGRiskCat4 ----
+lkpSEGRiskCat4 <- tibble::tibble(
+  risk_cat = 0:7,
+  risk_cat_txt = c(
+    "None",
+    "Slight, Lower",
+    "Slight, Higher",
+    "Moderate, Lower",
+    "Moderate, Higher",
+    "Severe, Lower",
+    "Severe, Upper",
+    "Extreme"
+  ),
+  ABSLB = c(-0.001, 0.5, 1, 1.5, 2, 2.5, 3, 3),
+  ABSUB = c(0.5, 1, 1.5, 2, 2.5, 3, 3.5, 1000)
+)
+
+risk_cat_joined <- dplyr::full_join(
+  x = risk_cat_cnts,
+  y = lkpSEGRiskCat4,
+  by = "risk_cat"
+)
+
+risk_cat_cols <- dplyr::mutate(
+  risk_cat_joined,
+  risk_cat = as.numeric(risk_cat),
+  Percent = base::paste0(
+    base::round(n / nrow(risk_vars) * 100,
+      digits = 1
+    ),
+    if_else(
+      condition = is.na(n),
+      true = "",
+      false = "%"
+    )
+  )
+) |> 
+  dplyr::arrange(desc(n))
+
+risk_cat_vars <- dplyr::select(risk_cat_cols,
+    `SEG Risk Level` = risk_cat,
+    `SEG Risk Category` = risk_cat_txt,
+    `Number of Pairs` = n,
+    Percent
+  )
+return(risk_cat_vars)
+}
+```
+
+
+```{r show-seg_risk_cat_tbl, eval=FALSE}
+seg_risk_cat_tbl(risk_vars_tbl)
+```
+
+```{r run-seg_risk_cat_tbl, echo=FALSE}
+knitr::kable(seg_risk_cat_tbl(risk_vars_tbl))
+```
+
+### Application `RiskCategoryTable`
+
+Below is the app display of the risk level table.
+
+```{r , echo=FALSE}
+knitr::include_graphics(path = "../man/figures/vand_comp_risk_level.png")
+```
+
+The risk level table is also built with [`DT`](https://rstudio.github.io/DT/), and I've built it below as `app_risk_level_tbl` (for testing)
+
+```{r app_risk_level_tbl}
+app_risk_level_tbl <- as.data.frame(
+  tibble::tibble(
+    `SEG Risk Level` = c(0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L),
+    `SEG Risk Category` = c(
+      'None', 
+      'Slight, Lower', 'Slight, Higher',
+      'Moderate, Lower','Moderate, Higher',
+      'Severe, Lower', 'Severe, Higher',
+      'Extreme'
+    ),
+    `Number of Pairs` = c(9474L, 294L, 55L, 24L, 11L, 10L, NA_integer_, NA_integer_),
+    Percent = c(
+      '96%', '3%', '0.6%', '0.2%', '0.1%', '0.1%', NA_character_, NA_character_
+    ),
+  )
+)
+```
+
+```{r show-app_risk_level_tbl, eval=FALSE}
+app_risk_level_tbl
+```
+
+```{r run-app_risk_level_tbl, echo=FALSE}
+knitr::kable(app_risk_level_tbl)
+```
+
+# Test 
+
+I'll limit the test to the `Number of Pairs` column.
+
+```{r , error=TRUE}
+testthat::test_that("Test risk category pairs", {
+testthat::expect_equal(
+  # function table
+  object = seg_risk_cat_tbl(risk_vars_tbl)$`Number of Pairs`, 
+  # application table
+  expected = app_risk_level_tbl$`Number of Pairs`
+  )
+})
+```

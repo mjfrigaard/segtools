@@ -1,0 +1,280 @@
+---
+title: "Compliant Pairs Table"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{Compliant Pairs Table}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+always_allow_html: true
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(vroom)
+library(janitor)
+library(waldo)
+library(diffobj)
+```
+
+The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+
+This vignette covers the development of the compliant pairs table function, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+
+
+## Load test data
+
+The `segtools` package uses [`testthat`](https://testthat.r-lib.org), a common testing framework for performing unit tests. I'll load a test data file used in [the GitHub repo](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL58-L58C47) (`VanderbiltComplete.csv`) below and run it in the shiny app to generate the tables for comparison.
+
+```{r test_vand_comp_data}
+github_data_root <-
+  "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+full_sample_repo <- base::paste0(github_data_root,
+  "VanderbiltComplete.csv")
+test_vand_comp_data <-
+  vroom::vroom(file = full_sample_repo, delim = ",")
+glimpse(test_vand_comp_data)
+```
+
+# Application (version 1.3.3) functions 
+
+Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+
+# SEG Risk Variables 
+
+Create the `risk_vars_tbl` from `seg_risk_vars()`:
+
+```{r risk_vars_tbl}
+risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
+dplyr::glimpse(risk_vars_tbl)
+```
+
+
+# Compliant Pairs Table 
+
+The compliant pairs table is created with [the `binomialTable()` function](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL404) in the original application, and uses the output from `segTable()` (which I've replaced with `seg_risk_vars()`).
+
+```{r binomialTable}
+binomialTable <- function(dat) {
+
+  dataset <- segTable(dat)
+
+  CompliantPairs <- nrow(dataset) - base::nrow(dplyr::filter(
+    dataset, iso_diff > 15)) %>%
+  tibble(
+    `Compliant Pairs` = .)
+# CompliantPairs
+# Then calculate the percent
+CompliantPairs <- CompliantPairs %>%
+  dplyr::mutate(
+    `Compliant Pairs %` =
+      base::paste0(base::round(
+        100 * `Compliant Pairs` / nrow(dataset),
+        1
+      ), "%") )
+# CompliantPairs
+# create probability
+prb <- 0.95
+p_value <- 0.05
+df_size <- nrow(dataset)
+qbinom_tibble <- qbinom(
+    p = p_value,
+    size = df_size,
+    prob = prb) %>%
+    tibble(`value` = .) %>%
+    # clean up this variable in the tibble for display
+    dplyr::rename(`Lower Bound for Acceptance` = value)
+# qbinom_tibble
+QbinomTable <- qbinom_tibble %>%
+  dplyr::mutate(
+    `Lower Bound for Acceptance %` =
+      base::paste0(base::round(
+        100 * `Lower Bound for Acceptance` / nrow(dataset),
+        1
+      ), "%")
+  )
+BinomialTest6 <- bind_cols(CompliantPairs, QbinomTable)
+BinomialTest6 <- BinomialTest6 %>% dplyr::mutate(
+  Result =
+    if_else(condition = `Compliant Pairs` < `Lower Bound for Acceptance`,
+      true = paste0(
+        BinomialTest6$`Compliant Pairs %`[1],
+        " < ",
+        BinomialTest6$`Lower Bound for Acceptance %`[1],
+        " - Does not meet BGM Surveillance Study Accuracy Standard"
+      ),
+      false = paste0(
+        BinomialTest6$`Compliant Pairs %`[1],
+        " > ",
+        BinomialTest6$`Lower Bound for Acceptance %`[1],
+        " - Meets BGM Surveillance Study Accuracy Standard"
+      )
+    )
+)
+return(BinomialTest6)
+}
+```
+
+
+I've re-written this below as `seg_binom_tbl()`
+
+## `seg_binom_tbl()`
+
+```{r seg_binom_tbl}
+seg_binom_tbl <- function(risk_vars) {
+  
+  compliant_pairs <- tibble(`Compliant Pairs` = 
+        base::nrow(risk_vars) - base::nrow(dplyr::filter(risk_vars, iso_diff > 15)))
+
+  # calculate the percent
+  compliant_pairs_perc <-
+    dplyr::mutate(compliant_pairs,
+      `Compliant Pairs %` =
+        base::paste0(base::round(
+          100 * `Compliant Pairs` / nrow(risk_vars),
+          1
+        ), "%")
+    )
+  # create probability
+  prb <- 0.95
+  p_value <- 0.05
+  df_size <- nrow(risk_vars)
+  qbinom_vector <- qbinom(
+    p = p_value,
+    size = df_size,
+    prob = prb
+  )
+    qbinom_tbl <- tibble(`Lower Bound for Acceptance` = qbinom_vector)
+    # clean up this variable in the tibble for display
+  # qbinom_tbl
+    qbinom_tbl <- dplyr::mutate(qbinom_tbl,
+      `Lower Bound for Acceptance %` =
+        base::paste0(base::round(
+          100 * `Lower Bound for Acceptance` / nrow(risk_vars),
+          1
+        ), "%")
+    )
+
+  binom_test_tbl <- dplyr::bind_cols(compliant_pairs_perc, qbinom_tbl)
+
+  binom_table <- dplyr::mutate(binom_test_tbl,
+    Result =
+      dplyr::if_else(condition = `Compliant Pairs` < `Lower Bound for Acceptance`,
+        true = paste0(
+          binom_test_tbl$`Compliant Pairs %`[1],
+          " < ",
+          binom_test_tbl$`Lower Bound for Acceptance %`[1],
+          " - Does not meet BGM Surveillance Study Accuracy Standard"
+        ),
+        false = paste0(
+          binom_test_tbl$`Compliant Pairs %`[1],
+          " > ",
+          binom_test_tbl$`Lower Bound for Acceptance %`[1],
+          " - Meets BGM Surveillance Study Accuracy Standard"
+        )
+      )
+  )
+  return(binom_table)
+}
+```
+
+Below I check `seg_binom_tbl()` with the output from `seg_risk_vars()`
+
+```{r seg_binom_tbl-show, eval=FALSE}
+seg_binom_tbl(risk_vars = risk_vars_tbl)
+```
+
+```{r seg_binom_tbl-kable, echo=FALSE}
+knitr::kable(
+seg_binom_tbl(risk_vars = risk_vars_tbl)  
+)
+```
+
+
+### Application `BinomialTest` table
+
+Below is the binomial test table (aka the compliant pairs table) in the application.
+
+```{r vand_comp_compliant_pairs, echo=FALSE}
+knitr::include_graphics(path = "../man/figures/vand_comp_compliant_pairs.png")
+```
+
+I've re-created this table as `app_binomial_tbl` below:
+
+```{r app_binomial_tbl-show, eval=FALSE}
+app_binomial_tbl <- tibble::as_tibble(data.frame(
+  stringsAsFactors = FALSE,
+  check.names = FALSE,
+  `Compliant Pairs` = c(9220L),
+  `Compliant Pairs %` = c("93.4%"),
+  `Lower Bound for Acceptance` = c(9339L),
+  `Lower Bound for Acceptance %` = c("94.6%"),
+  Result = c("93.4% < 94.6% - Does not meet BGM Surveillance Study Accuracy Standard")
+))
+app_binomial_tbl
+```
+
+```{r app_binomial_tbl-kable, echo=FALSE}
+app_binomial_tbl <- tibble::as_tibble(data.frame(
+  stringsAsFactors = FALSE,
+  check.names = FALSE,
+  `Compliant Pairs` = c(9220L),
+  `Compliant Pairs %` = c("93.4%"),
+  `Lower Bound for Acceptance` = c(9339L),
+  `Lower Bound for Acceptance %` = c("94.6%"),
+  Result = c("93.4% < 94.6% - Does not meet BGM Surveillance Study Accuracy Standard")
+))
+knitr::kable(app_binomial_tbl)
+```
+
+
+# Test 
+
+We'll do a final test of the binomial test table. 
+
+```{r , error=TRUE}
+testthat::test_that("Test compliant pairs table", {
+testthat::expect_equal(
+  # function table
+  object = seg_binom_tbl(risk_vars = risk_vars_tbl),
+  # application table
+  expected = app_binomial_tbl
+  )
+})
+```

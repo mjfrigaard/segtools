@@ -12,7 +12,7 @@
 #' @examples
 #' test_data <- import_flat_file(system.file("extdata", "VanderbiltComplete.csv",
 #'                               package = "segtools"))
-#'
+#' utils::str(test_data)
 import_flat_file <- function(path) {
   ext <- tools::file_ext(path)
   data <- switch(ext,

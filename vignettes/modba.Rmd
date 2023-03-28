@@ -1,0 +1,59 @@
+---
+title: "SEG modified Bland-Altman plot"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SEG modified Bland-Altman plot}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+```
+
+
+```{r vanderbilt_complete}
+vanderbilt_complete <- vroom::vroom(
+  file = system.file("extdata", "VanderbiltComplete.csv", 
+                      package = "segtools"),
+  delim = ",")
+dplyr::glimpse(vanderbilt_complete)
+```
+
+```{r seg_modba_graph}
+seg_modba_graph(data = vanderbilt_complete)
+```
+

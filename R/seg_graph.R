@@ -9,7 +9,15 @@
 #' @return SEG grid graph
 #' @export seg_graph
 #'
+#' @examples
+#' require(vroom)
+#' vanderbilt_complete <- vroom::vroom(
+#'  file =
+#'    system.file("extdata", "VanderbiltComplete.csv",
+#'                package = "segtools"), delim = ",")
+#' seg_graph(vanderbilt_complete)
 seg_graph <- function(data,
+                      text_size = 14,
                       alpha_var = 0.6,
                       size_var = 2.3,
                       color_var = "#000000",
@@ -98,6 +106,6 @@ seg_graph <- function(data,
   )
 
   seg_grid +
-    theme_seg(base_size = 16)
+    theme_seg(base_size = text_size)
 
 }

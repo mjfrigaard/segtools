@@ -4,10 +4,12 @@
 \alias{seg_modba_graph}
 \title{The SEG modified Bland-Altman plot}
 \usage{
-seg_modba_graph(data)
+seg_modba_graph(data, text_size = 16)
 }
 \arguments{
 \item{data}{Dataset containing only \code{BGM} and \code{REF} columns}
+
+\item{text_size}{base size passed to \code{theme_seg()}}
 }
 \value{
 modified Bland-Altman plot
@@ -21,5 +23,5 @@ vanderbilt_complete <- vroom::vroom(
  file =
    system.file("extdata", "VanderbiltComplete.csv",
                package = "segtools"), delim = ",")
-seg_modba_graph(data = vanderbilt_complete, is_path = FALSE)
+seg_modba_graph(data = vanderbilt_complete)
 }

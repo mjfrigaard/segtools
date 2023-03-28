@@ -1,0 +1,739 @@
+---
+title: "SEG Risk Variables"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{SEG Risk Variables}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+always_allow_html: true
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(vroom)
+library(janitor)
+library(waldo)
+library(diffobj)
+```
+
+The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+
+This vignette covers the development of the risk variables table, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+
+
+## Load test data
+
+The `segtools` package uses [`testthat`](https://testthat.r-lib.org), a common testing framework for performing unit tests. I'll load a test data file used in [the GitHub repo](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL58-L58C47) (`VanderbiltComplete.csv`) below and run it in the shiny app to generate the tables for comparison.
+
+```{r test_vand_comp_data}
+github_data_root <-
+  "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+full_sample_repo <- base::paste0(github_data_root,
+  "VanderbiltComplete.csv")
+test_vand_comp_data <-
+  vroom::vroom(file = full_sample_repo, delim = ",")
+glimpse(test_vand_comp_data)
+```
+
+# Application (version 1.3.3) functions 
+
+Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+
+# SEG risk variables 
+
+The SEG variables were initially created with the [`segTable()` function](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#L289). I've included it below:
+
+```{r segTable}
+segTable <- function(dat) {
+
+  # 3.1 - import data frame -----
+  SampMeasData <- suppressWarnings(readr::read_csv(file = dat))
+
+  SampMeasData %>%
+    dplyr::mutate(BGM = as.double(BGM),
+                  REF = as.double(REF)) %>%
+
+  # create bgm_pair_cat ---- 
+    dplyr::mutate(
+      bgm_pair_cat =
+        dplyr::case_when(
+          BGM < REF ~ "BGM < REF",
+          BGM == REF ~ "BGM = REF",
+          BGM > REF ~ "BGM > REF"
+        )
+    ) |> 
+    # 3.3 create ref_pair_2cat ---- 
+    dplyr::mutate(
+      ref_pair_2cat =
+        dplyr::case_when(
+          REF > 600 ~ "REF > 600: Excluded from SEG Analysis",
+          REF < 21 & REF <= 600 ~ "REF <21: Included in SEG Analysis"
+        )
+    ) %>%
+    # # 3.4 create included ---- 
+    dplyr::mutate(
+      included =
+        dplyr::case_when(
+          REF <= 600 ~ "Total included in SEG Analysis",
+          REF > 600 ~ "Total excluded in SEG Analysis"
+        )
+    ) %>%
+    # 3.5 join to RiskPairData ---- 
+    dplyr::inner_join(.,
+      y = RiskPairData,
+      by = c("BGM", "REF")
+    ) %>%
+    dplyr::mutate( # 3.6 Create risk_cat variable ----
+      risk_cat =
+        base::findInterval(
+          x = abs_risk, # the abs_risk absolute value
+          vec = LookUpRiskCat$ABSLB, # the lower bound absolute risk
+          left.open = TRUE
+        ) - 1
+    ) %>%
+    dplyr::inner_join( # 3.7 Join to LookUpRiskCat data ---- 
+      x = ., y = LookUpRiskCat, # inner join to look-up
+      by = "risk_cat"
+    ) %>%
+    dplyr::mutate(
+      risk_cat_txt = # text risk categories
+      dplyr::case_when(
+        abs_risk < 0.5 ~ "None",
+        abs_risk >= 0.5 & abs_risk <= 1 ~ "Slight, Lower",
+        abs_risk > 1 & abs_risk <= 1.5 ~ "Slight, Higher",
+        abs_risk > 1.5 & abs_risk <= 2.0 ~ "Moderate, Lower",
+        abs_risk > 2 & abs_risk <= 2.5 ~ "Moderate, Higher",
+        abs_risk > 2.5 & abs_risk <= 3.0 ~ "Severe, Lower",
+        abs_risk > 3.0 & abs_risk <= 3.5 ~ "Severe, Higher",
+        abs_risk > 3.5 ~ "Extreme"
+      )
+    ) %>%
+    dplyr::mutate(
+      rel_diff = (BGM - REF) / REF, # relative diff
+      abs_rel_diff = abs(rel_diff), # abs relative diff
+      sq_rel_diff = rel_diff^2,
+      iso_diff =
+      if_else(REF >= 100, # condition 1
+        100 * abs(BGM - REF) / REF, # T 1
+        if_else(REF < 100, # condition 2
+          abs(BGM - REF), # T 2
+          NA_real_
+        ), # F 2
+        NA_real_
+      ), # F1
+      iso_range = # # 4.3.16 create iso range variable ----
+      dplyr::case_when(
+          # # A tibble: 5 x 2
+          #      ID iso_range
+          #   <int> <chr>
+          # 1     1 <= 5% or 5 mg/dL
+          # 2     2 > 5 - 10% or mg/dL
+          # 3     3 > 10 - 15% or mg/dL
+          # 4     4 > 15 - 20% mg/dL
+          # 5     5 > 20% or 20 mg/dL
+        iso_diff <= 5 ~ "<= 5% or 5 mg/dL",
+        iso_diff > 5 & iso_diff <= 10 ~ "> 5 - 10% or mg/dL",
+        iso_diff > 10 & iso_diff <= 15 ~ "> 10 - 15% or mg/dL",
+        iso_diff > 15 & iso_diff <= 20 ~ "> 15 - 20% mg/dL",
+        iso_diff > 20 ~ "> 20% or 20 mg/dL"),
+
+      risk_grade = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "A",
+        abs_risk >= 0.5 & abs_risk < 1.0 ~ "B",
+        abs_risk >= 1.0 & abs_risk < 2.0 ~ "C",
+        abs_risk >= 2.0 & abs_risk < 3.0 ~ "D",
+        abs_risk >= 3.0 ~ "E"
+      ),
+      risk_grade_txt = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "0 - 0.5",
+        abs_risk >= 0.5 & abs_risk < 1.0 ~ "> 0.5 - 1.0",
+        abs_risk >= 1.0 & abs_risk < 2.0 ~ "> 1.0 - 2.0",
+        abs_risk >= 2.0 & abs_risk < 3.0 ~ "> 2.0 - 3.0",
+        abs_risk >= 3.0 ~ "> 3.0"
+      )
+    )
+}
+```
+
+### Error
+
+When I try this with the `full_sample_repo`, I get the following error:
+
+```{r error=TRUE}
+segTable(dat = full_sample_repo)
+```
+
+# `seg_risk_vars()`
+
+The `seg_risk_vars()` functions splits the `segTable()` into two parts: risk category columns and ISO columns.
+
+## SEG Risk Category Columns
+
+I'll split `segTable()` into two parts to identify the bug:
+
+-   `seg_risk_cat_cols()` imports the `AppLookUpRiskCat.csv` and `AppRiskPairData.csv` inside the function.
+
+```{r seg_risk_cat_cols}
+seg_risk_cat_cols <- function(df) {
+  github_data_root <-
+    "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+
+  # import LookUpRiskCat -----
+  app_lookup_repo <- base::paste0(
+    github_data_root,
+    "AppLookUpRiskCat.csv"
+  )
+  LookUpRiskCat <- vroom::vroom(file = app_lookup_repo, delim = ",")
+
+  # import RiskPairData -----
+  app_riskpair_repo <- base::paste0(
+    github_data_root,
+    "AppRiskPairData.csv"
+  )
+  RiskPairData <- vroom::vroom(file = app_riskpair_repo, delim = ",")
+
+  # directly manipulate df
+  bgm_ref_tbl <- dplyr::mutate(df,
+    BGM = as.double(BGM),
+    REF = as.double(REF)
+  )
+
+  # create bgm_pair_cat ----
+  bgm_pair_cat_tbl <- dplyr::mutate(bgm_ref_tbl,
+    bgm_pair_cat =
+      dplyr::case_when(
+        BGM < REF ~ "BGM < REF",
+        BGM == REF ~ "BGM = REF",
+        BGM > REF ~ "BGM > REF"
+      )
+  )
+  # create ref_pair_2cat ----
+  ref_pair_2cat_tbl <- dplyr::mutate(bgm_pair_cat_tbl,
+    ref_pair_2cat =
+      dplyr::case_when(
+        REF > 600 ~ "REF > 600: Excluded from SEG Analysis",
+        REF < 21 & REF <= 600 ~ "REF <21: Included in SEG Analysis"
+      )
+  )
+  # create included ----
+  included_tbl <- dplyr::mutate(ref_pair_2cat_tbl,
+    included =
+      dplyr::case_when(
+        REF <= 600 ~ "Total included in SEG Analysis",
+        REF > 600 ~ "Total excluded in SEG Analysis"
+      )
+  )
+  # join to RiskPairData ----
+  risk_pair_tbl <- dplyr::inner_join(included_tbl,
+    y = RiskPairData,
+    by = c("BGM", "REF")
+  )
+  # Create risk_cat variable ----
+  risk_cat_tbl <- dplyr::mutate(risk_pair_tbl,
+    risk_cat =
+      base::findInterval(
+        x = abs_risk, # the abs_risk absolute value
+        vec = LookUpRiskCat$ABSLB, # the lower bound absolute risk
+        left.open = TRUE
+      ) - 1
+  )
+  # Join to LookUpRiskCat data ----
+  risk_cat_join_tbl <- dplyr::inner_join(
+    x = risk_cat_tbl,
+    y = LookUpRiskCat, # inner join to look-up
+    by = "risk_cat"
+  )
+  # create text risk categories ----
+  seg_risk_cat_cols_tbl <- dplyr::mutate(risk_cat_join_tbl,
+      risk_cat_txt = 
+      dplyr::case_when(
+        abs_risk < 0.5 ~ "None",
+        abs_risk >= 0.5 & abs_risk <= 1 ~ "Slight, Lower",
+        abs_risk > 1 & abs_risk <= 1.5 ~ "Slight, Higher",
+        abs_risk > 1.5 & abs_risk <= 2.0 ~ "Moderate, Lower",
+        abs_risk > 2 & abs_risk <= 2.5 ~ "Moderate, Higher",
+        abs_risk > 2.5 & abs_risk <= 3.0 ~ "Severe, Lower",
+        abs_risk > 3.0 & abs_risk <= 3.5 ~ "Severe, Higher",
+        abs_risk > 3.5 ~ "Extreme"
+      )
+    )
+  return(seg_risk_cat_cols_tbl)
+}
+```
+
+I test `seg_risk_cat_cols()` with `test_vand_comp_data`:
+
+```{r}
+seg_risk_cat_cols(df = test_vand_comp_data)
+```
+
+## SEG ISO Range Columns
+
+`seg_iso_cols()` creates the ISO columns:
+
+```{r seg_iso_cols}
+seg_iso_cols <- function(risk_cat_cols) {
+    iso_cols_tbl <- dplyr::mutate(risk_cat_cols, 
+      rel_diff = (BGM - REF) / REF, # relative diff
+      abs_rel_diff = abs(rel_diff), # abs relative diff
+      sq_rel_diff = rel_diff^2,
+      iso_diff =
+      if_else(REF >= 100, # condition 1
+        100 * abs(BGM - REF) / REF, # T 1
+        if_else(REF < 100, # condition 2
+          abs(BGM - REF), # T 2
+          NA_real_
+        ), # F 2
+        NA_real_
+      ), # F1
+      iso_range = # # 4.3.16 create iso range variable ----
+      dplyr::case_when(
+        iso_diff <= 5 ~ "<= 5% or 5 mg/dL",
+        iso_diff > 5 & iso_diff <= 10 ~ "> 5 - 10% or mg/dL",
+        iso_diff > 10 & iso_diff <= 15 ~ "> 10 - 15% or mg/dL",
+        iso_diff > 15 & iso_diff <= 20 ~ "> 15 - 20% mg/dL",
+        iso_diff > 20 ~ "> 20% or 20 mg/dL"),
+
+      risk_grade = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "A",
+        abs_risk >= 0.5 & abs_risk < 1.0 ~ "B",
+        abs_risk >= 1.0 & abs_risk < 2.0 ~ "C",
+        abs_risk >= 2.0 & abs_risk < 3.0 ~ "D",
+        abs_risk >= 3.0 ~ "E"
+      ),
+      risk_grade_txt = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "0 - 0.5",
+        abs_risk >= 0.5 & abs_risk < 1.0 ~ "> 0.5 - 1.0",
+        abs_risk >= 1.0 & abs_risk < 2.0 ~ "> 1.0 - 2.0",
+        abs_risk >= 2.0 & abs_risk < 3.0 ~ "> 2.0 - 3.0",
+        abs_risk >= 3.0 ~ "> 3.0"
+      )
+    )
+    return(iso_cols_tbl)
+}
+```
+
+`seg_iso_cols()` accepts the output from `seg_risk_cat_cols()` and returns a dataset with all the risk/ISO variables. 
+
+```{r test-seg_risk_cat_cols-seg_iso_cols}
+risk_cat_vars <- seg_risk_cat_cols(df = test_vand_comp_data)
+iso_vars_tbl <- seg_iso_cols(risk_cat_cols = risk_cat_vars)
+glimpse(iso_vars_tbl)
+```
+
+## Combine SEG Risk Category and ISO Range columns
+
+`seg_risk_vars()` is a wrapper around `seg_risk_cat_cols()` and `seg_iso_cols()`:
+
+```{r seg_risk_vars}
+seg_risk_vars <- function(df) {
+  seg_risk_cat_cols <- function(df) {
+  github_data_root <-
+    "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+
+  # import LookUpRiskCat -----
+  app_lookup_repo <- base::paste0(
+    github_data_root,
+    "AppLookUpRiskCat.csv"
+  )
+  LookUpRiskCat <- vroom::vroom(file = app_lookup_repo, delim = ",")
+
+  # import RiskPairData -----
+  app_riskpair_repo <- base::paste0(
+    github_data_root,
+    "AppRiskPairData.csv"
+  )
+  RiskPairData <- vroom::vroom(file = app_riskpair_repo, delim = ",")
+
+  # directly manipulate df
+  bgm_ref_tbl <- dplyr::mutate(df,
+    BGM = as.double(BGM),
+    REF = as.double(REF)
+  )
+
+  # create bgm_pair_cat ----
+  bgm_pair_cat_tbl <- dplyr::mutate(bgm_ref_tbl,
+    bgm_pair_cat =
+      dplyr::case_when(
+        BGM < REF ~ "BGM < REF",
+        BGM == REF ~ "BGM = REF",
+        BGM > REF ~ "BGM > REF"
+      )
+  )
+  # create ref_pair_2cat ----
+  ref_pair_2cat_tbl <- dplyr::mutate(bgm_pair_cat_tbl,
+    ref_pair_2cat =
+      dplyr::case_when(
+        REF > 600 ~ "REF > 600: Excluded from SEG Analysis",
+        REF < 21 & REF <= 600 ~ "REF <21: Included in SEG Analysis"
+      )
+  )
+  # create included ----
+  included_tbl <- dplyr::mutate(ref_pair_2cat_tbl,
+    included =
+      dplyr::case_when(
+        REF <= 600 ~ "Total included in SEG Analysis",
+        REF > 600 ~ "Total excluded in SEG Analysis"
+      )
+  )
+  # join to RiskPairData ----
+  risk_pair_tbl <- dplyr::inner_join(included_tbl,
+    y = RiskPairData,
+    by = c("BGM", "REF")
+  )
+  # Create risk_cat variable ----
+  risk_cat_tbl <- dplyr::mutate(risk_pair_tbl,
+    risk_cat =
+      base::findInterval(
+        x = abs_risk, # the abs_risk absolute value
+        vec = LookUpRiskCat$ABSLB, # the lower bound absolute risk
+        left.open = TRUE
+      ) - 1
+  )
+  # Join to LookUpRiskCat data ----
+  risk_cat_join_tbl <- dplyr::inner_join(
+    x = risk_cat_tbl,
+    y = LookUpRiskCat, # inner join to look-up
+    by = "risk_cat"
+  )
+  # create text risk categories ----
+  seg_risk_cat_cols_tbl <- dplyr::mutate(risk_cat_join_tbl,
+      risk_cat_txt = 
+      dplyr::case_when(
+        abs_risk < 0.5 ~ "None",
+        abs_risk >= 0.5 & abs_risk <= 1 ~ "Slight, Lower",
+        abs_risk > 1 & abs_risk <= 1.5 ~ "Slight, Higher",
+        abs_risk > 1.5 & abs_risk <= 2.0 ~ "Moderate, Lower",
+        abs_risk > 2 & abs_risk <= 2.5 ~ "Moderate, Higher",
+        abs_risk > 2.5 & abs_risk <= 3.0 ~ "Severe, Lower",
+        abs_risk > 3.0 & abs_risk <= 3.5 ~ "Severe, Higher",
+        abs_risk > 3.5 ~ "Extreme"
+      )
+    )
+  return(seg_risk_cat_cols_tbl)
+  }
+  
+  risk_cat_cols <- seg_risk_cat_cols(df = test_vand_comp_data)
+
+  seg_iso_cols <- function(risk_cat_cols) {
+    iso_cols_tbl <- dplyr::mutate(risk_cat_cols, 
+      rel_diff = (BGM - REF) / REF, # relative diff
+      abs_rel_diff = abs(rel_diff), # abs relative diff
+      sq_rel_diff = rel_diff^2,
+      iso_diff =
+      if_else(REF >= 100, # condition 1
+        100 * abs(BGM - REF) / REF, # T 1
+        if_else(REF < 100, # condition 2
+          abs(BGM - REF), # T 2
+          NA_real_
+        ), # F 2
+        NA_real_
+      ), # F1
+      iso_range = # # 4.3.16 create iso range variable ----
+      dplyr::case_when(
+        iso_diff <= 5 ~ "<= 5% or 5 mg/dL",
+        iso_diff > 5 & iso_diff <= 10 ~ "> 5 - 10% or mg/dL",
+        iso_diff > 10 & iso_diff <= 15 ~ "> 10 - 15% or mg/dL",
+        iso_diff > 15 & iso_diff <= 20 ~ "> 15 - 20% mg/dL",
+        iso_diff > 20 ~ "> 20% or 20 mg/dL"),
+
+      risk_grade = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "A",
+        abs_risk >= 0.5 & abs_risk < 1.0 ~ "B",
+        abs_risk >= 1.0 & abs_risk < 2.0 ~ "C",
+        abs_risk >= 2.0 & abs_risk < 3.0 ~ "D",
+        abs_risk >= 3.0 ~ "E"
+      ),
+      risk_grade_txt = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "0 - 0.5",
+        abs_risk >= 0.5 & abs_risk < 1.0 ~ "> 0.5 - 1.0",
+        abs_risk >= 1.0 & abs_risk < 2.0 ~ "> 1.0 - 2.0",
+        abs_risk >= 2.0 & abs_risk < 3.0 ~ "> 2.0 - 3.0",
+        abs_risk >= 3.0 ~ "> 3.0"
+      )
+    )
+    return(iso_cols_tbl)
+  }
+  
+  risk_vars <- seg_iso_cols(risk_cat_cols = risk_cat_cols)
+  return(risk_vars)
+}
+```
+
+Below I check the differences between `seg_risk_vars()` and the `iso_vars_tbl` output:
+
+# Test
+
+```{r}
+testthat::test_that("Test seg_risk_vars()", {
+  testthat::expect_equal(
+    # function table
+    object = seg_risk_vars(df = test_vand_comp_data), 
+    # ISO vars table
+    expected = iso_vars_tbl
+  )
+})
+```
+
+```{r compare-risk_vars_tbl-iso_vars_tbl, include=FALSE}
+risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
+```
+
+
+# Discrepancies with Risk Grade table 
+
+Due to discrepancies in the application risk grade table, the `risk_grade` and `risk_grade_txt` variables needed to be adjusted in the `seg_iso_cols()` function (see code below):
+
+```{r error-risk_grade_txt, eval=FALSE}
+      risk_grade = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "A",
+        abs_risk >= 0.5 & abs_risk < 1.5 ~ "B",
+        abs_risk >= 1.5 & abs_risk < 2.5 ~ "C",
+        abs_risk >= 2.5 & abs_risk < 3.5 ~ "D",
+        abs_risk >= 3.5 ~ "E"
+      ),
+      risk_grade_txt = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "0 - 0.5",
+        abs_risk >= 0.5 & abs_risk < 1.0 ~ "> 0.5 - 1.0",
+        abs_risk >= 1.0 & abs_risk < 2.0 ~ "> 1.0 - 2.0",
+        abs_risk >= 2.0 & abs_risk < 3.0 ~ "> 2.0 - 3.0",
+        abs_risk >= 3.0 ~ "> 3.0"
+      )
+```
+
+# Updated `seg_risk_vars()`
+
+I remedy this issue in an updated `seg_risk_vars()` function below:
+
+```{r updated-seg_iso_cols}
+seg_iso_cols <- function(risk_cat_vars) {
+    iso_vars_tbl <- dplyr::mutate(risk_cat_vars,
+      rel_diff = (BGM - REF) / REF, # relative diff
+      abs_rel_diff = abs(rel_diff), # abs relative diff
+      sq_rel_diff = rel_diff^2,
+      iso_diff =
+        if_else(REF >= 100, # condition 1
+          100 * abs(BGM - REF) / REF, # T 1
+          if_else(REF < 100, # condition 2
+            abs(BGM - REF), # T 2
+            NA_real_
+          ), # F 2
+          NA_real_
+        ), # F1
+      iso_range = # # 4.3.16 create iso range variable ----
+        dplyr::case_when(
+          iso_diff <= 5 ~ "<= 5% or 5 mg/dL",
+          iso_diff > 5 & iso_diff <= 10 ~ "> 5 - 10% or mg/dL",
+          iso_diff > 10 & iso_diff <= 15 ~ "> 10 - 15% or mg/dL",
+          iso_diff > 15 & iso_diff <= 20 ~ "> 15 - 20% mg/dL",
+          iso_diff > 20 ~ "> 20% or 20 mg/dL"
+        ),
+      risk_grade = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "A",
+        abs_risk >= 0.5 & abs_risk < 1.5 ~ "B",
+        abs_risk >= 1.5 & abs_risk < 2.5 ~ "C",
+        abs_risk >= 2.5 & abs_risk < 3.5 ~ "D",
+        abs_risk >= 3.5 ~ "E"
+      ),
+      risk_grade_txt = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "0 - 0.5",
+        abs_risk >= 0.5 & abs_risk < 1.5 ~ "> 0.5 - 1.5",
+        abs_risk >= 1.5 & abs_risk < 2.5 ~ "> 1.5 - 2.5",
+        abs_risk >= 2.5 & abs_risk < 3.5 ~ "> 2.5 - 3.5",
+        abs_risk >= 3.5 ~ "> 3.5"
+      )
+    )
+    return(iso_vars_tbl)
+}
+```
+
+Create a new `iso_vars_tbl`
+
+```{r test-updated-seg_risk_cat_cols-seg_iso_cols}
+# create risk categories
+risk_cat_vars <- seg_risk_cat_cols(df = test_vand_comp_data)
+# create ISO columns
+iso_vars_tbl <- seg_iso_cols(risk_cat_vars = risk_cat_vars)
+glimpse(iso_vars_tbl)
+```
+
+Updated `seg_risk_vars()`:
+
+```{r fix-risk_grade_txt-seg_risk_vars}
+seg_risk_vars <- function(df) {
+  
+  seg_risk_cat_cols <- function(df) {
+    LookUpRiskCat <- data.frame(
+      risk_cat = c(0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L),
+      ABSLB = c(-0.001, 0.5, 1, 1.5, 2, 2.5, 3, 3.5),
+      ABSUB = c(0.5, 1, 1.5, 2, 2.5, 3, 3.5, 10)
+    )
+
+    # import RiskPairData -----
+    RiskPairData <- segtools::RiskPairData
+
+    # directly manipulate df
+    bgm_ref_tbl <- dplyr::mutate(df,
+      BGM = as.double(BGM),
+      REF = as.double(REF)
+    )
+
+    # create bgm_pair_cat ----
+    bgm_pair_cat_tbl <- dplyr::mutate(bgm_ref_tbl,
+      bgm_pair_cat =
+        dplyr::case_when(
+          BGM < REF ~ "BGM < REF",
+          BGM == REF ~ "BGM = REF",
+          BGM > REF ~ "BGM > REF"
+        )
+    )
+    # create ref_pair_2cat ----
+    ref_pair_2cat_tbl <- dplyr::mutate(bgm_pair_cat_tbl,
+      ref_pair_2cat =
+        dplyr::case_when(
+          REF > 600 ~ "REF > 600: Excluded from SEG Analysis",
+          REF < 21 & REF <= 600 ~ "REF <21: Included in SEG Analysis"
+        )
+    )
+    # create included ----
+    included_tbl <- dplyr::mutate(ref_pair_2cat_tbl,
+      included =
+        dplyr::case_when(
+          REF <= 600 ~ "Total included in SEG Analysis",
+          REF > 600 ~ "Total excluded in SEG Analysis"
+        )
+    )
+    # join to RiskPairData ----
+    risk_pair_tbl <- dplyr::inner_join(included_tbl,
+      y = RiskPairData,
+      by = c("BGM", "REF")
+    )
+    # Create risk_cat variable ----
+    risk_cat_tbl <- dplyr::mutate(risk_pair_tbl,
+      risk_cat =
+        base::findInterval(
+          x = abs_risk, # the abs_risk absolute value
+          vec = LookUpRiskCat$ABSLB, # the lower bound absolute risk
+          left.open = TRUE
+        ) - 1
+    )
+    # Join to LookUpRiskCat data ----
+    risk_cat_join_tbl <- dplyr::inner_join(
+      x = risk_cat_tbl,
+      y = LookUpRiskCat, # inner join to look-up
+      by = "risk_cat"
+    )
+    # create text risk categories ----
+    seg_risk_cat_vars_tbl <- dplyr::mutate(risk_cat_join_tbl,
+      risk_cat_txt =
+        dplyr::case_when(
+          abs_risk < 0.5 ~ "None",
+          abs_risk >= 0.5 & abs_risk <= 1 ~ "Slight, Lower",
+          abs_risk > 1 & abs_risk <= 1.5 ~ "Slight, Higher",
+          abs_risk > 1.5 & abs_risk <= 2.0 ~ "Moderate, Lower",
+          abs_risk > 2 & abs_risk <= 2.5 ~ "Moderate, Higher",
+          abs_risk > 2.5 & abs_risk <= 3.0 ~ "Severe, Lower",
+          abs_risk > 3.0 & abs_risk <= 3.5 ~ "Severe, Higher",
+          abs_risk > 3.5 ~ "Extreme"
+        )
+    )
+    return(seg_risk_cat_vars_tbl)
+  }
+
+  risk_cat_vars_tbl <- seg_risk_cat_cols(df = df)
+
+  seg_iso_cols <- function(risk_cat_vars) {
+    iso_vars_tbl <- dplyr::mutate(risk_cat_vars,
+      rel_diff = (BGM - REF) / REF, # relative diff
+      abs_rel_diff = abs(rel_diff), # abs relative diff
+      sq_rel_diff = rel_diff^2,
+      iso_diff =
+        if_else(REF >= 100, # condition 1
+          100 * abs(BGM - REF) / REF, # T 1
+          if_else(REF < 100, # condition 2
+            abs(BGM - REF), # T 2
+            NA_real_
+          ), # F 2
+          NA_real_
+        ), # F1
+      iso_range = # # 4.3.16 create iso range variable ----
+        dplyr::case_when(
+          iso_diff <= 5 ~ "<= 5% or 5 mg/dL",
+          iso_diff > 5 & iso_diff <= 10 ~ "> 5 - 10% or mg/dL",
+          iso_diff > 10 & iso_diff <= 15 ~ "> 10 - 15% or mg/dL",
+          iso_diff > 15 & iso_diff <= 20 ~ "> 15 - 20% mg/dL",
+          iso_diff > 20 ~ "> 20% or 20 mg/dL"
+        ),
+      risk_grade = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "A",
+        abs_risk >= 0.5 & abs_risk < 1.5 ~ "B",
+        abs_risk >= 1.5 & abs_risk < 2.5 ~ "C",
+        abs_risk >= 2.5 & abs_risk < 3.5 ~ "D",
+        abs_risk >= 3.5 ~ "E"
+      ),
+      risk_grade_txt = dplyr::case_when(
+        abs_risk >= 0.0 & abs_risk < 0.5 ~ "0 - 0.5",
+        abs_risk >= 0.5 & abs_risk < 1.5 ~ "> 0.5 - 1.5",
+        abs_risk >= 1.5 & abs_risk < 2.5 ~ "> 1.5 - 2.5",
+        abs_risk >= 2.5 & abs_risk < 3.5 ~ "> 2.5 - 3.5",
+        abs_risk >= 3.5 ~ "> 3.5"
+      )
+    )
+    return(iso_vars_tbl)
+  }
+
+  iso_vars_tbl <- seg_iso_cols(risk_cat_vars = risk_cat_vars_tbl)
+
+  return(iso_vars_tbl)
+}
+```
+
+# Re-Test
+
+```{r}
+testthat::test_that("Test seg_risk_vars()", {
+  testthat::expect_equal(
+    # function table
+    object = seg_risk_vars(df = test_vand_comp_data), 
+    # ISO vars table
+    expected = iso_vars_tbl
+  )
+})
+```

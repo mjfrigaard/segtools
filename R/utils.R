@@ -139,6 +139,9 @@ get_pkgs <- function() {
 #' SEG data switch
 #'
 #' @export get_seg_data
+#'
+#' @examples
+#' get_seg_data("names")
 get_seg_data <- function(data) {
   gh_root <- "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
   switch(EXPR = data,
@@ -179,4 +182,3 @@ get_seg_data <- function(data) {
     )
   )
 }
-get_seg_data("names")

@@ -1,0 +1,192 @@
+---
+title: "ISO Range Table"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{ISO Range Table}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+  
+always_allow_html: true
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "../man/figures/",
+  out.width = "100%",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(vroom)
+library(janitor)
+library(waldo)
+library(diffobj)
+```
+
+The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+
+This vignette covers the development of the ISO range table function, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+
+
+## Load test data
+
+The `segtools` package uses [`testthat`](https://testthat.r-lib.org), a common testing framework for performing unit tests. I'll load a test data file used in [the GitHub repo](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL58-L58C47) (`VanderbiltComplete.csv`) below and run it in the shiny app to generate the tables for comparison.
+
+```{r test_vand_comp_data}
+github_data_root <-
+  "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
+full_sample_repo <- base::paste0(github_data_root,
+  "VanderbiltComplete.csv")
+test_vand_comp_data <-
+  vroom::vroom(file = full_sample_repo, delim = ",")
+glimpse(test_vand_comp_data)
+```
+
+# Application (version 1.3.3) functions 
+
+Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+
+# SEG Risk Variables 
+
+Create the `risk_vars_tbl` from `seg_risk_vars()`:
+
+```{r risk_vars_tbl}
+risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
+dplyr::glimpse(risk_vars_tbl)
+```
+
+
+# ISO Range Table 
+
+[The `ISORangeTable5` table](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#LL828C32-L828C46) is also created in the server function in the `App.R` file.
+
+## `seg_iso_range_tbl()`
+
+I've re-written this below as `seg_iso_range_tbl()`:
+
+```{r seg_iso_range_tbl}
+seg_iso_range_tbl <- function(risk_vars) {
+
+  lkpISORanges <- tibble::tribble(
+       ~ID,                ~iso_range,
+        1L,    "<= 5% or 5 mg/dL",
+        2L,  "> 5 - 10% or mg/dL",
+        3L, "> 10 - 15% or mg/dL",
+        4L,    "> 15 - 20% mg/dL",
+        5L,   "> 20% or 20 mg/dL")
+
+  iso_range_cnts <- dplyr::count(risk_vars,
+    iso_range,
+    sort = TRUE
+  )
+
+  iso_range_joined <- dplyr::full_join(
+    x = iso_range_cnts,
+    y = lkpISORanges,
+    by = "iso_range"
+  )
+    iso_range_vars <- dplyr::mutate(iso_range_joined,
+    Percent = base::paste0(
+      base::round(n / nrow(risk_vars) * 100,
+        digits = 1
+      ),
+      dplyr::if_else(condition = is.na(n),
+        true = "",
+        false = "%"
+      )
+    )
+  ) |>
+    dplyr::arrange(desc(n))
+
+  iso_range_vars_tbl <- dplyr::select(iso_range_vars, ID,
+    `ISO range` = iso_range,
+    N = n,
+    Percent
+  )
+  return(iso_range_vars_tbl)
+}
+```
+
+```{r test-seg_iso_range_tbl}
+seg_iso_range_tbl(risk_vars_tbl)
+```
+
+#### Application `ISORangeTable`
+
+Below is the output for the `ISORangeTable` in the application
+
+```{r vand_comp_iso_range, echo=FALSE}
+knitr::include_graphics(path = "../man/figures/vand_comp_iso_range.png")
+```
+
+I've re-created this as `app_iso_range_tbl` below:
+
+```{r app_iso_range_tbl-show, eval=FALSE}
+app_iso_range_tbl <- tibble::tribble(
+     ~ID,          ~`ISO range`,    ~N, ~Percent,
+      1L,    "<= 5% or 5 mg/dL", 5328L,    "54%",
+      2L,  "> 5 - 10% or mg/dL", 2842L,  "28.8%",
+      3L, "> 10 - 15% or mg/dL", 1050L,  "10.6%",
+      4L,    "> 15 - 20% mg/dL",  340L,   "3.4%",
+      5L,   "> 20% or 20 mg/dL",  308L,   "3.1%"
+     )
+app_iso_range_tbl
+```
+
+```{r app_iso_range_tbl-kable, echo=FALSE}
+app_iso_range_tbl <- tibble::tribble(
+     ~ID,          ~`ISO range`,    ~N, ~Percent,
+      1L,    "<= 5% or 5 mg/dL", 5328L,    "54%",
+      2L,  "> 5 - 10% or mg/dL", 2842L,  "28.8%",
+      3L, "> 10 - 15% or mg/dL", 1050L,  "10.6%",
+      4L,    "> 15 - 20% mg/dL",  340L,   "3.4%",
+      5L,   "> 20% or 20 mg/dL",  308L,   "3.1%"
+     )
+knitr::kable(app_iso_range_tbl)
+```
+
+#### Test 
+
+Below we test the two `ISORangeTable` tables
+
+```{r , eval=TRUE}
+testthat::test_that("Test risk grade table", {
+testthat::expect_equal(
+  # function table
+  object = seg_iso_range_tbl(risk_vars_tbl),
+  # application table
+  expected = app_iso_range_tbl
+  )
+})
+```
+
