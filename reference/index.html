@@ -27,9 +27,21 @@
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/datasets.html">Lookup datasets</a>
-    <a class="dropdown-item" href="../articles/risk-tables.html">Risk Tables</a>
-    <a class="dropdown-item" href="../articles/seg-graph.html">SEG Graph</a>
+    <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
+    <a class="dropdown-item" href="../articles/segtools.html">Start</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Tabels</h6>
+    <a class="dropdown-item" href="../articles/risk-vars.html">Risk Variables</a>
+    <a class="dropdown-item" href="../articles/pair-types.html">Pair types</a>
+    <a class="dropdown-item" href="../articles/mard.html">MARD</a>
+    <a class="dropdown-item" href="../articles/risk-grade.html">Risk Grade</a>
+    <a class="dropdown-item" href="../articles/risk-categories.html">Risk Categories</a>
+    <a class="dropdown-item" href="../articles/iso-ranges.html">ISO Ranges</a>
+    <a class="dropdown-item" href="../articles/compliant-pairs.html">Compliant Pairs</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Graphs</h6>
+    <a class="dropdown-item" href="../articles/seg-graph.html">Surveillance Error Grid</a>
+    <a class="dropdown-item" href="../articles/modba.html">Modified Bland-Altman Plot</a>
   </div>
 </li>
 <li class="nav-item">
@@ -49,9 +61,9 @@
     </div>
 
     <div class="section level2">
-      <h2 id="all-functions">All functions<a class="anchor" aria-label="anchor" href="#all-functions"></a></h2>
+      <h2 id="seg-tools">SEG tools<a class="anchor" aria-label="anchor" href="#seg-tools"></a></h2>
       
-      
+      <p class="section-desc"></p><p>Functions for creating SEG table variables</p>
 
       
     </div><div id="" class="section level2">
@@ -61,9 +73,112 @@
 
       <dl><dt>
           
+          <code><a href="seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code> 
+        </dt>
+        <dd>SEG risk category variables</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_iso_cols.html">seg_iso_cols()</a></code> 
+        </dt>
+        <dd>Title</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_risk_vars.html">seg_risk_vars()</a></code> 
+        </dt>
+        <dd>SEG risk columns (wrapper function)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="seg-tables">SEG Tables<a class="anchor" aria-label="anchor" href="#seg-tables"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for creating output tabels</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="seg_binom_tbl.html">seg_binom_tbl()</a></code> 
+        </dt>
+        <dd>Create compliant pairs table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_iso_range_tbl.html">seg_iso_range_tbl()</a></code> 
+        </dt>
+        <dd>SEG iso range table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_mard_tbl.html">seg_mard_tbl()</a></code> 
+        </dt>
+        <dd>SEG MARD table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_pair_type_tbl.html">seg_pair_type_tbl()</a></code> 
+        </dt>
+        <dd>SEG pairs type table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_risk_cat_tbl.html">seg_risk_cat_tbl()</a></code> 
+        </dt>
+        <dd>SEG risk category table</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_risk_grade_tbl.html">seg_risk_grade_tbl()</a></code> 
+        </dt>
+        <dd>SEG risk grade table</dd>
+      </dl></div><div class="section level2">
+      <h2 id="seg-graphs">SEG Graphs<a class="anchor" aria-label="anchor" href="#seg-graphs"></a></h2>
+      
+      <p class="section-desc"></p><p>Functions for creating output graphs</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="seg_graph.html">seg_graph()</a></code> 
+        </dt>
+        <dd>ggplot2 function for SEG grid</dd>
+      </dl><dl><dt>
+          
+          <code><a href="seg_modba_graph.html">seg_modba_graph()</a></code> 
+        </dt>
+        <dd>The SEG modified Bland-Altman plot</dd>
+      </dl><dl><dt>
+          
+          <code><a href="theme_seg.html">theme_seg()</a></code> 
+        </dt>
+        <dd>ggplot2 theme (for SEG grid)</dd>
+      </dl></div><div class="section level2">
+      <h2 id="utilities">Utilities<a class="anchor" aria-label="anchor" href="#utilities"></a></h2>
+      
+      <p class="section-desc"></p><p>Helper functions</p>
+
+      
+    </div><div id="" class="section level2">
+      
+      
+      
+
+      <dl><dt>
+          
+          <code><a href="list_extdata_paths.html">list_extdata_paths()</a></code> 
+        </dt>
+        <dd>Find inst/extdata/ paths</dd>
+      </dl><dl><dt>
+          
           <code><a href="get_extdata.html">get_extdata()</a></code> 
         </dt>
         <dd>Import data files from inst/extdata/ folder</dd>
+      </dl><dl><dt>
+          
+          <code><a href="rgb2hex.html">rgb2hex()</a></code> 
+        </dt>
+        <dd>RGB to hex color</dd>
       </dl><dl><dt>
           
           <code><a href="get_importFrom.html">get_importFrom()</a></code> 
@@ -84,78 +199,9 @@
           <code><a href="import_flat_file.html">import_flat_file()</a></code> 
         </dt>
         <dd>Import plain text data file</dd>
-      </dl><dl><dt>
-          
-          <code><a href="list_extdata_paths.html">list_extdata_paths()</a></code> 
-        </dt>
-        <dd>Find inst/extdata/ paths</dd>
-      </dl><dl><dt>
-          
-          <code><a href="rgb2hex.html">rgb2hex()</a></code> 
-        </dt>
-        <dd>RGB to hex color</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_binom_tbl.html">seg_binom_tbl()</a></code> 
-        </dt>
-        <dd>Create compliant pairs table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_graph.html">seg_graph()</a></code> 
-        </dt>
-        <dd>ggplot2 function for SEG grid</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_iso_cols.html">seg_iso_cols()</a></code> 
-        </dt>
-        <dd>Title</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_iso_range_tbl.html">seg_iso_range_tbl()</a></code> 
-        </dt>
-        <dd>SEG iso range table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_mard_tbl.html">seg_mard_tbl()</a></code> 
-        </dt>
-        <dd>SEG MARD table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_modba_graph.html">seg_modba_graph()</a></code> 
-        </dt>
-        <dd>The SEG modified Bland-Altman plot</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_pair_type_tbl.html">seg_pair_type_tbl()</a></code> 
-        </dt>
-        <dd>SEG pairs type table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code> 
-        </dt>
-        <dd>SEG risk category variables</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_risk_cat_tbl.html">seg_risk_cat_tbl()</a></code> 
-        </dt>
-        <dd>SEG risk category table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_risk_grade_tbl.html">seg_risk_grade_tbl()</a></code> 
-        </dt>
-        <dd>SEG risk grade table</dd>
-      </dl><dl><dt>
-          
-          <code><a href="seg_risk_vars.html">seg_risk_vars()</a></code> 
-        </dt>
-        <dd>SEG risk columns (wrapper function)</dd>
-      </dl><dl><dt>
-          
-          <code><a href="theme_seg.html">theme_seg()</a></code> 
-        </dt>
-        <dd>ggplot2 theme (for SEG grid)</dd>
       </dl></div>
-  </main></div>
+  </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
+    </nav></aside></div>
 
 
     <footer><div class="pkgdown-footer-left">

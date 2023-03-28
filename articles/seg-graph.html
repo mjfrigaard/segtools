@@ -47,9 +47,21 @@
 <li class="active nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="../articles/datasets.html">Lookup datasets</a>
-    <a class="dropdown-item" href="../articles/risk-tables.html">Risk Tables</a>
-    <a class="dropdown-item" href="../articles/seg-graph.html">SEG Graph</a>
+    <h6 class="dropdown-header" data-toc-skip>Getting started</h6>
+    <a class="dropdown-item" href="../articles/segtools.html">Start</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Tabels</h6>
+    <a class="dropdown-item" href="../articles/risk-vars.html">Risk Variables</a>
+    <a class="dropdown-item" href="../articles/pair-types.html">Pair types</a>
+    <a class="dropdown-item" href="../articles/mard.html">MARD</a>
+    <a class="dropdown-item" href="../articles/risk-grade.html">Risk Grade</a>
+    <a class="dropdown-item" href="../articles/risk-categories.html">Risk Categories</a>
+    <a class="dropdown-item" href="../articles/iso-ranges.html">ISO Ranges</a>
+    <a class="dropdown-item" href="../articles/compliant-pairs.html">Compliant Pairs</a>
+    <div class="dropdown-divider"></div>
+    <h6 class="dropdown-header" data-toc-skip>Graphs</h6>
+    <a class="dropdown-item" href="../articles/seg-graph.html">Surveillance Error Grid</a>
+    <a class="dropdown-item" href="../articles/modba.html">Modified Bland-Altman Plot</a>
   </div>
 </li>
 <li class="nav-item">
@@ -123,10 +135,11 @@ the input data (<code>FullSampleData</code>)</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_graph.html">seg_graph</a></span><span class="op">(</span></span>
 <span>  data <span class="op">=</span> <span class="va">FullSampleData</span>, </span>
+<span>  text_size <span class="op">=</span> <span class="fl">16</span>,</span>
 <span>  alpha_var <span class="op">=</span> <span class="fl">3</span><span class="op">/</span><span class="fl">4</span>,</span>
 <span>  size_var <span class="op">=</span> <span class="fl">3</span>, </span>
-<span>  color_var <span class="op">=</span> <span class="st">"#03396c"</span>, </span>
-<span>  fill_var <span class="op">=</span> <span class="st">"#BBEEFF"</span><span class="op">)</span></span></code></pre></div>
+<span>  color_var <span class="op">=</span> <span class="st">"#4D4D4D"</span>, </span>
+<span>  fill_var <span class="op">=</span> <span class="st">"#FFFFFF"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="../reference/figures/seg_graph-args-1.png" width="100%"></p>
 </div>
 <div class="section level2">

@@ -2,11 +2,18 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
+  compliant-pairs: compliant-pairs.html
   datasets: datasets.html
-  risk-tables: risk-tables.html
+  iso-ranges: iso-ranges.html
+  mard: mard.html
+  modba: modba.html
+  pair-types: pair-types.html
+  risk-categories: risk-categories.html
+  risk-grade: risk-grade.html
+  risk-vars: risk-vars.html
   seg-graph: seg-graph.html
   segtools: segtools.html
-last_built: 2023-03-24T00:05Z
+last_built: 2023-03-28T19:31Z
 urls:
   reference: https://mjfrigaard.github.io/segtools/reference
   article: https://mjfrigaard.github.io/segtools/articles
