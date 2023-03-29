@@ -175,10 +175,10 @@ get_seg_data <- function(data) {
     lkpSEGRiskCat4 = vroom::vroom(file = paste0(gh_root, "lkpSEGRiskCat4.csv"), delim = ",", show_col_types = FALSE),
     # names ----
     names = c(
-      "VanderbiltComplete.csv", "AppRiskPairData.csv", "RiskPairData.csv", "AppLookUpRiskCat.csv", "LookUpRiskCat.csv",
-      "AppTestData.csv", "AppTestDataSmall.csv", "AppTestDataMed.csv", "AppTestDataBig.csv", "FullSampleData.csv",
-      "ModBAData.csv", "No_Interference_Dogs.csv", "SEGRiskTable.csv", "SampMeasData.csv", "SampleData.csv",
-      "lkpRiskGrade.csv", "lkpSEGRiskCat4.csv"
+      "VanderbiltComplete", "AppRiskPairData", "RiskPairData", "AppLookUpRiskCat", "LookUpRiskCat",
+      "AppTestData", "AppTestDataSmall", "AppTestDataMed", "AppTestDataBig", "FullSampleData",
+      "ModBAData", "No_Interference_Dogs", "SEGRiskTable", "SampMeasData", "SampleData",
+      "lkpRiskGrade", "lkpSEGRiskCat4"
     )
   )
 }

@@ -1,6 +1,12 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<br>
+
+<img src="man/figures/package_hex.png" width="20%" style="display: block; margin: auto auto auto 0;" />
+
+<br>
+
 # segtools
 
 <!-- badges: start -->

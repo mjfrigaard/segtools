@@ -73,3 +73,7 @@ navbar:
       href: articles/seg-graph.html
     - text: Modified Bland-Altman Plot
       href: articles/modba.html
+    - text: ggplot2 heat-map
+      href: articles/heatmap.html
+    - text: Package hex sticker
+      href: articles/hexsticker.html

@@ -1,0 +1,321 @@
+---
+title: "Hex sticker"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 4
+vignette: >
+  %\VignetteIndexEntry{Hex sticker}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE, results='hide'}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  dev = "ragg_png",
+  dpi = 320,
+  fig.asp = 0.718,
+  # fig.asp = 0.618,
+  fig.retina = 0.4,
+  out.width = "100%",
+  fig.width = 8,
+  fig.path = "../man/figures/",
+  eval = TRUE,
+  warning = FALSE,
+  message = FALSE
+)
+# colourpicker install
+# devtools::install_github("daattali/colourpicker", force = TRUE, quiet = TRUE)
+# import font ----
+library(extrafont)
+extrafont::loadfonts(quiet = TRUE)
+extrafont::font_import(
+    paths = "../inst/assets/Ubuntu/",
+    prompt = FALSE)
+# add font ----
+sysfonts::font_add(
+    family =  "Ubuntu", 
+    regular = "../inst/assets/Ubuntu/Ubuntu-Regular.ttf")
+# if necessary: 
+# remotes::install_github("yixuan/showtext", force = TRUE)
+library(showtext)
+# add Arial
+# sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
+showtext::showtext_auto()
+```
+
+```{r pkgs, message=FALSE, warning=FALSE}
+library(segtools)
+library(dplyr)
+library(ggplot2)
+```
+
+# Package hex sticker 
+
+
+## Data
+
+To create the `SEG` using `ggplot`, I need to load a few data
+inputs from [Github.](https://github.com/mjfrigaard/seg-shiny-data). I can do this with the `segtools::get_seg_data()` function in the code chunk below:
+
+1.  `risk_pairs` -\> this assigns a risk factor value to each BGM
+    measurement
+3.  `vand_data` -\> this is a dataset from Vanderbilt used to create
+    some of the initial calculations
+    
+```{r get_seg_data}
+segtools::get_seg_data("names")
+```
+
+```{r import}
+risk_pairs <- segtools::get_seg_data("AppRiskPairData")
+vand_data <- segtools::get_seg_data("VanderbiltComplete")
+```
+
+`risk_pairs` has columns and risk pairs for both `REF` and `BGM`, and the `RiskFactor` variable for each pair of `REF` and `BGM` data. Below you can see a sample of the `REF`, `BGM`, `RiskFactor`, and `abs_risk` variables.
+
+```{r}
+risk_pairs |> 
+  dplyr::sample_n(size = 10) |>  
+  dplyr::select(
+    REF, BGM, RiskFactor, abs_risk)
+```
+
+`vand_data` contains blood glucose monitor measurements, with only `BGM` and `REF` values.
+
+```{r}
+vand_data |>  
+  dplyr::sample_n(size = 10) |> 
+  dplyr::select(REF, BGM)
+```
+
+## Graph constants 
+
+```{r mmolConvFactor}
+mmolConvFactor <- segtools::mmolConvFactor
+mmolConvFactor
+```
+
+```{r risk_factor_colors}
+risk_factor_colors <- segtools::risk_factor_colors
+```
+
+```{r base_data}
+base_data <- segtools::base_data
+base_data
+```
+
+## SEG graph
+
+```{r ggp_seg_hex}
+ggp_seg_hex <- ggplot() +
+  geom_point(
+    data = base_data,
+    aes(
+      x = x_coordinate,
+      y = y_coordinate,
+      fill = color_gradient
+    ),
+    show.legend = FALSE
+  ) +
+  geom_point(
+    data = risk_pairs,
+    aes(
+      x = REF,
+      y = BGM,
+      color = abs_risk
+    ),
+    show.legend = FALSE
+  ) +
+  ggplot2::scale_color_gradientn(
+    colors = risk_factor_colors,
+    guide = "none",
+    limits = c(0, 4),
+    values = scales::rescale(c(
+      0, # darkgreen
+      0.4375, # green
+      1.0625, # yellow
+      2.7500, # red
+      4.0000
+    ))
+  ) +
+  ggplot2::scale_fill_gradientn(
+    values = scales::rescale(c(
+      0, # darkgreen
+      0.4375, # green
+      1.0625, # yellow
+      2.75, # red
+      4.0 # brown
+    )),
+    limits = c(0, 4),
+    colors = risk_factor_colors,
+    guide = ggplot2::guide_colorbar(
+      ticks = FALSE,
+      barheight = unit(100, "mm")
+    ),
+    breaks = c(0.25, 1, 2, 3, 3.75),
+    labels = c(
+      "None", "Slight",
+      "Moderate", "High", "Extreme"
+    ),
+    name = "Risk level"
+  ) +
+  ggplot2::scale_y_continuous(
+    limits = c(0, 600),
+    sec.axis =
+      sec_axis(~ . / mmolConvFactor,
+        name = "Measured blood glucose (mmol/L)"
+      ),
+    name = "Measured blood glucose (mg/dL)"
+  ) +
+  ggplot2::scale_x_continuous(
+    limits = c(0, 600),
+    sec.axis =
+      sec_axis(~ . / mmolConvFactor,
+        name = "Reference blood glucose (mmol/L)"
+      ),
+    name = "Reference blood glucose (mg/dL)"
+  ) +
+  ggplot2::geom_point(
+    data = vand_data,
+    ggplot2::aes(
+      x = REF,
+      y = BGM
+    ),
+    shape = 21,
+    alpha = 0.6,
+    size = 2.3,
+    color = "#000000",
+    fill = "#FFFFFF",
+    stroke = 0.4
+  ) +
+  ggplot2::theme_void(base_size = 20, base_family = "Ubuntu")
+ggp_seg_hex
+```
+
+## Modified Bland-Altman Plot
+
+```{r ggp_modba_hex}
+ln_risk_pairs <- dplyr::mutate(vand_data,
+
+        lnREF = log(REF),
+
+        lnBGM = log(BGM),
+
+        lnDiff = lnBGM - lnREF,
+
+        rel_perc_diff = exp(lnDiff) - 1)
+
+ggp_modba_hex <- ggplot2::ggplot(data = ln_risk_pairs,
+  mapping = ggplot2::aes(x = REF, y = rel_perc_diff)) +
+
+ggplot2::geom_point(
+  alpha = 1.0,
+  size = 2.5,
+  shape = 21,
+  fill = "#FFFFFF",
+  color = "#005b96") +
+
+  ggplot2::geom_point(
+  alpha = 1.0,
+  shape = 21,
+  size = 1.88,
+  color = "#def3f6", #03396c
+  fill = "#03396c") +
+
+ggplot2::scale_y_continuous(
+  limits = c(-0.50, 0.50)
+) +
+
+ggplot2::geom_line(
+  ggplot2::aes(x = Ref, y = UB),
+  data = segtools::APPSEGBlandAltmanRefVals,
+  linetype = "dotted",
+  lineend = "round",
+  linejoin = "round",
+  color = "#ce2b37",
+  linewidth = 2.2,
+  alpha = 0.85
+) +
+
+ggplot2::geom_line(
+  ggplot2::aes(x = Ref, y = LB),
+  data = segtools::APPSEGBlandAltmanRefVals,
+  linetype = "dotted",
+  lineend = "round",
+  linejoin = "round",
+  color = "#ce2b37",
+  linewidth = 2.2,
+  alpha = 0.85
+) +
+ggplot2::theme_void(base_size = 20)
+ggp_modba_hex
+```
+
+## Convert to hex sticker 
+
+I'll remove the legend and other graph elements for the hex sticker. 
+
+```{r ggp_modba}
+library(patchwork)
+seg_hex <- ggp_seg_hex + ggp_modba_hex + patchwork::plot_layout(ncol = 1)
+seg_hex
+```
+
+
+Save this image in a high-quality format. 
+
+```{r save-ggp_hex_image}
+ggsave(plot = seg_hex,
+  filename = "../man/figures/seg_hex.png", 
+  scale = 1.5, dpi = "retina", device = "png", 
+  width = 8, height = 7, units = "in")
+```
+
+
+Install the `hexSticker` package (and the `magick` package if needed)
+
+```{r}
+# remotes::install_github("GuangchuangYu/hexSticker")
+library(hexSticker)
+library(magick)
+```
+
+Import the image and makes the customizations for the hex sticker image
+
+```{r}
+img_path <- "../man/figures/seg_hex.png"
+hexSticker::sticker(
+  img_path,
+  u_family = "Ubuntu",
+  # colors 
+  h_fill = "#FFFFFF", # fill
+  p_color = "#02577A", # package name
+  h_color = "#043b67", # hexagon border
+  u_color = "#fa7b3c", # color for url
+  
+  package = "segtools",
+  p_size = 17,
+  
+  p_x = 1,
+  p_y = 1.61,
+  
+  s_x = 1,
+  s_y = .92,
+  s_width = .62,
+  url = "mjfrigaard.github.io/segtools",
+  white_around_sticker = FALSE,
+  filename = "../man/figures/package_hex.png",
+  u_size = 4.5,
+)
+```
+
+Review
+
+```{r}
+knitr::include_graphics("../man/figures/package_hex.png")
+```
+
+

@@ -43,10 +43,19 @@ sysfonts::font_add("Arial", "/Library/Fonts/Arial.ttf")
 showtext::showtext_auto()
 ```
 
+<br>
+
+```{r package_hex, echo=FALSE, out.width='20%', fig.align='left'}
+knitr::include_graphics("man/figures/package_hex.png")
+```
+
+<br>
+
 # segtools
 
 <!-- badges: start -->
 <!-- badges: end -->
+
 
 `segtools` provides the underlying functions and calculations for [The Surveillance Error Grid](https://www.diabetestechnology.org/seg.shtml) shiny application.
 
