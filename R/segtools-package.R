@@ -17,5 +17,6 @@
 #'
 #'
 #' @import ggplot2
+#' @import patchwork
 #'
 NULL

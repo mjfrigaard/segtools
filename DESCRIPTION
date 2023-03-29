@@ -13,6 +13,7 @@ Imports:
     extrafont,
     ggplot2,
     ggforce,
+    patchwork,
     janitor,
     png,
     purrr,
