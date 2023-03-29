@@ -55,7 +55,9 @@ library(diffobj)
 
 The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
 
-This vignette covers the development of the MARD table function, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+## Objective
+
+This vignette covers the MARD table function, and performs unit tests on the output from the `seg_mard_tbl()` function to ensure they match the table output in the [application](https://www.diabetestechnology.org/seg/). 
 
 
 ## Load test data
@@ -72,9 +74,9 @@ test_vand_comp_data <-
 glimpse(test_vand_comp_data)
 ```
 
-# Application (version 1.3.3) functions 
+### Application (version 1.3.3) functions 
 
-Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+The previous application functions are stored in the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the GitHub repo.
 
 # SEG Risk Variables 
 
@@ -85,13 +87,13 @@ risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
 dplyr::glimpse(risk_vars_tbl)
 ```
 
-## MARD Table 
+# MARD Table 
 
 The `MARDTable` is created in the server function of the application, starting [here](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L669). 
 
 I've converted it into a function, `seg_mard_tbl()`, which takes the output from `seg_risk_vars()`: 
 
-### `seg_mard_tbl()`
+## `seg_mard_tbl()`
 
 ```{r seg_mard_tbl}
 seg_mard_tbl <- function(risk_vars) {
@@ -140,19 +142,19 @@ seg_mard_tbl <- function(risk_vars) {
 }
 ```
 
-Below I test the `seg_mard_tbl()` function 
+Below I check the `seg_mard_tbl()` function:
 
-```{r test-seg_mard_tbl-show, eval=FALSE}
+```{r check-seg_mard_tbl-show, eval=FALSE}
 seg_mard_tbl(risk_vars = risk_vars_tbl)
 ```
 
-```{r test-seg_mard_tbl-run, echo=FALSE}
+```{r check-seg_mard_tbl-run, echo=FALSE}
 knitr::kable(
   seg_mard_tbl(risk_vars = risk_vars_tbl)
 )
 ```
 
-### Application `MARDTable` 
+## Application `MARDTable` 
 
 The MARD table from the application is below: 
 
@@ -184,7 +186,7 @@ app_mard_tbl <- tibble::tibble(
 knitr::kable(app_mard_tbl)
 ```
 
-## Test 
+### Test 
 
 Below I test both MARD tables using `testthat::expect_equal()` again:
 

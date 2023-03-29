@@ -53,10 +53,11 @@ library(waldo)
 library(diffobj)
 ```
 
-The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+The risk tables are created using functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
 
-This vignette covers the development of the risk variables table, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+## Objective
 
+This vignette covers the development of the risk variables and performs unit tests on the associated functions to ensure the output matches the tables in the [application](https://www.diabetestechnology.org/seg/). 
 
 ## Load test data
 
@@ -72,15 +73,15 @@ test_vand_comp_data <-
 glimpse(test_vand_comp_data)
 ```
 
-# Application (version 1.3.3) functions 
+### Application (version 1.3.3) functions 
 
-Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+The previous application functions are stored in the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the GitHub repo.
 
 # SEG risk variables 
 
-The SEG variables were initially created with the [`segTable()` function](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#L289). I've included it below:
+The SEG variables were initially created with the [`segTable()` function](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#L289)
 
-```{r segTable}
+```{r segTable, echo=FALSE}
 segTable <- function(dat) {
 
   # 3.1 - import data frame -----
@@ -192,7 +193,7 @@ segTable <- function(dat) {
 }
 ```
 
-### Error
+## Error
 
 When I try this with the `full_sample_repo`, I get the following error:
 
@@ -200,17 +201,15 @@ When I try this with the `full_sample_repo`, I get the following error:
 segTable(dat = full_sample_repo)
 ```
 
-# `seg_risk_vars()`
+I've split the previous `segTable()` function splits into into two parts: risk category columns (`seg_risk_cat_cols()`) and ISO columns (`seg_iso_cols()`).
 
-The `seg_risk_vars()` functions splits the `segTable()` into two parts: risk category columns and ISO columns.
-
-## SEG Risk Category Columns
+### SEG Risk Category Columns
 
 I'll split `segTable()` into two parts to identify the bug:
 
 -   `seg_risk_cat_cols()` imports the `AppLookUpRiskCat.csv` and `AppRiskPairData.csv` inside the function.
 
-```{r seg_risk_cat_cols}
+```{r seg_risk_cat_cols, echo=FALSE}
 seg_risk_cat_cols <- function(df) {
   github_data_root <-
     "https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"
@@ -298,17 +297,18 @@ seg_risk_cat_cols <- function(df) {
 }
 ```
 
-I test `seg_risk_cat_cols()` with `test_vand_comp_data`:
+I check `seg_risk_cat_cols()` with the `test_vand_comp_data`:
 
-```{r}
-seg_risk_cat_cols(df = test_vand_comp_data)
+```{r check-seg_risk_cat_cols}
+risk_cat_vars <- seg_risk_cat_cols(df = test_vand_comp_data)
+glimpse(risk_cat_vars)
 ```
 
-## SEG ISO Range Columns
+### SEG ISO Range Columns
 
 `seg_iso_cols()` creates the ISO columns:
 
-```{r seg_iso_cols}
+```{r seg_iso_cols, echo=FALSE}
 seg_iso_cols <- function(risk_cat_cols) {
     iso_cols_tbl <- dplyr::mutate(risk_cat_cols, 
       rel_diff = (BGM - REF) / REF, # relative diff
@@ -350,19 +350,18 @@ seg_iso_cols <- function(risk_cat_cols) {
 }
 ```
 
-`seg_iso_cols()` accepts the output from `seg_risk_cat_cols()` and returns a dataset with all the risk/ISO variables. 
+`seg_iso_cols()` accepts the output from `seg_risk_cat_cols()` and returns a dataset with all the risk/ISO variables.
 
-```{r test-seg_risk_cat_cols-seg_iso_cols}
-risk_cat_vars <- seg_risk_cat_cols(df = test_vand_comp_data)
+```{r check-seg_iso_cols}
 iso_vars_tbl <- seg_iso_cols(risk_cat_cols = risk_cat_vars)
 glimpse(iso_vars_tbl)
 ```
 
-## Combine SEG Risk Category and ISO Range columns
+## `seg_risk_vars()`
 
-`seg_risk_vars()` is a wrapper around `seg_risk_cat_cols()` and `seg_iso_cols()`:
+`seg_risk_vars()` combines the SEG risk category and ISO range columns into a wrapper function:
 
-```{r seg_risk_vars}
+```{r seg_risk_vars, echo=FALSE}
 seg_risk_vars <- function(df) {
   seg_risk_cat_cols <- function(df) {
   github_data_root <-
@@ -499,7 +498,7 @@ seg_risk_vars <- function(df) {
 
 Below I check the differences between `seg_risk_vars()` and the `iso_vars_tbl` output:
 
-# Test
+### Test
 
 ```{r}
 testthat::test_that("Test seg_risk_vars()", {
@@ -516,10 +515,17 @@ testthat::test_that("Test seg_risk_vars()", {
 risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
 ```
 
+# Update: discrepancies with `Risk Grade` table 
 
-# Discrepancies with Risk Grade table 
+Due to discrepancies in the application risk grade table output, the `risk_grade` and `risk_grade_txt` variables have been adjusted in the `seg_iso_cols()` function (see table below):
 
-Due to discrepancies in the application risk grade table, the `risk_grade` and `risk_grade_txt` variables needed to be adjusted in the `seg_iso_cols()` function (see code below):
+<br>
+
+```{r 2014-risk-zones-paper-png, echo=FALSE, out.width='80%', fig.align='center', fig.cap='J Diabetes Sci Technol. 2014 Jul;8(4):658-72. doi: 10.1177/1932296814539589.'}
+knitr::include_graphics(path = "../man/figures/2014-risk-zones-paper.png")
+```
+
+The **Risk Factor Range** code has been updated to reflect the risk zones in the [Surveillance Error Grid paper.](https://pubmed.ncbi.nlm.nih.gov/25562886/)
 
 ```{r error-risk_grade_txt, eval=FALSE}
       risk_grade = dplyr::case_when(
@@ -538,11 +544,13 @@ Due to discrepancies in the application risk grade table, the `risk_grade` and `
       )
 ```
 
-# Updated `seg_risk_vars()`
+## Updated `seg_iso_cols()`
 
 I remedy this issue in an updated `seg_risk_vars()` function below:
 
-```{r updated-seg_iso_cols}
+<br>
+
+```{r updated-seg_iso_cols, echo=FALSE}
 seg_iso_cols <- function(risk_cat_vars) {
     iso_vars_tbl <- dplyr::mutate(risk_cat_vars,
       rel_diff = (BGM - REF) / REF, # relative diff
@@ -584,7 +592,8 @@ seg_iso_cols <- function(risk_cat_vars) {
 }
 ```
 
-Create a new `iso_vars_tbl`
+
+To verify, I'll use `seg_risk_cat_cols()` and `seg_iso_cols()` to create a new `iso_vars_tbl`:
 
 ```{r test-updated-seg_risk_cat_cols-seg_iso_cols}
 # create risk categories
@@ -594,9 +603,11 @@ iso_vars_tbl <- seg_iso_cols(risk_cat_vars = risk_cat_vars)
 glimpse(iso_vars_tbl)
 ```
 
-Updated `seg_risk_vars()`:
+## Updated `seg_risk_vars()`
 
-```{r fix-risk_grade_txt-seg_risk_vars}
+Now I can compare this output to the output from the updated  `seg_risk_vars()` function:
+
+```{r fix-risk_grade_txt-seg_risk_vars, echo=FALSE}
 seg_risk_vars <- function(df) {
   
   seg_risk_cat_cols <- function(df) {
@@ -725,12 +736,12 @@ seg_risk_vars <- function(df) {
 }
 ```
 
-# Re-Test
+### Re-Test
 
 ```{r}
 testthat::test_that("Test seg_risk_vars()", {
   testthat::expect_equal(
-    # function table
+    # updated function table
     object = seg_risk_vars(df = test_vand_comp_data), 
     # ISO vars table
     expected = iso_vars_tbl

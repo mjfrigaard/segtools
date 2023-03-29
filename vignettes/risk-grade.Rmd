@@ -53,10 +53,11 @@ library(waldo)
 library(diffobj)
 ```
 
-The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories.
 
-This vignette covers the development of the risk grade table function and look-up table, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+# Objective
 
+This vignette covers the risk grade table function (`seg_risk_grade_tbl()`), including unit tests and comparisons of the output from `seg_risk_grade_tbl()` to the output in the [application](https://www.diabetestechnology.org/seg/). 
 
 ## Load test data
 
@@ -72,11 +73,15 @@ test_vand_comp_data <-
 glimpse(test_vand_comp_data)
 ```
 
-# Application (version 1.3.3) functions 
+### Application (version 1.3.3) helper functions 
 
-Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+The previous risk grade table functions come from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
 
-# SEG Risk Variables 
+# Risk Grade Table
+
+The `RiskGradeTable3` is also created in the [server function of the previous application](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L728). 
+
+## SEG Risk Variables 
 
 Create the `risk_vars_tbl` from `seg_risk_vars()`:
 
@@ -85,11 +90,11 @@ risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
 dplyr::glimpse(risk_vars_tbl)
 ```
 
-# Risk Grade Table
+## `seg_risk_grade_tbl()`
 
-The [`RiskGradeTable3`](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L728) is also created in the server, which I've wrapped into a function: 
+I've re-written the previous server code into the `seg_risk_grade_tbl()` function: 
 
-```{r seg_risk_grade_tbl}
+```{r seg_risk_grade_tbl, echo=FALSE}
 seg_risk_grade_tbl <- function(risk_vars) {
   risk_grade_cnts <- dplyr::count(risk_vars,
     risk_grade,
@@ -134,25 +139,46 @@ seg_risk_grade_tbl <- function(risk_vars) {
 }
 ```
 
-```{r test-seg_risk_grade_tbl-show, eval=FALSE}
-seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
+```{r re-check-seg_risk_vars, eval=FALSE}
+risk_grade_tbl <- seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
+risk_grade_tbl
 ```
 
+
 ```{r test-seg_risk_grade_tbl-run, echo=FALSE}
+risk_grade_tbl <- seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
 knitr::kable(
-  seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
+  risk_grade_tbl
 )
 ```
 
-I'll compare this to the application output below:
+<br>
 
-### Application `RiskGradeTable` 
+The **Risk Factor Range** values comes from the table in the [Surveillance Error Grid paper.](https://pubmed.ncbi.nlm.nih.gov/25562886/)
+
+<br>
+
+```{r 2014-risk-zones-paper-png, echo=FALSE, out.width='80%', fig.align='center', fig.cap='J Diabetes Sci Technol. 2014 Jul;8(4):658-72. doi: 10.1177/1932296814539589.'}
+knitr::include_graphics(path = "../man/figures/2014-risk-zones-paper.png")
+```
+
+<br>
+
+I'll compare this to the application output (using the same test data) below:
+
+## Application `RiskGradeTable` 
+
+<br>
 
 ```{r vand_comp_risk_grade-png, echo=FALSE}
 knitr::include_graphics(path = "../man/figures/vand_comp_risk_grade.png")
 ```
 
-But I can build it manually and wrap the output `tibble` in the `data.frame`).
+<br>
+
+I'll build the image output above manually and wrap the output `tibble` in the `data.frame` as `app_risk_grade_tbl`
+
+<br>
 
 ```{r app_risk_grade_tbl}
 app_risk_grade_tbl <- as.data.frame(
@@ -167,9 +193,13 @@ app_risk_grade_tbl <- as.data.frame(
 )
 ```
 
+<br>
+
 ```{r show-app_risk_grade_tbl, eval=FALSE}
 app_risk_grade_tbl
 ```
+
+<br>
 
 ```{r run-app_risk_grade_tbl, echo=FALSE}
 knitr::kable(app_risk_grade_tbl)
@@ -177,34 +207,29 @@ knitr::kable(app_risk_grade_tbl)
 
 # Test
 
-Now I test the `seg_risk_vars()` and `seg_risk_grade_tbl()` functions:
+Below I'll test the `seg_risk_vars()` and `seg_risk_grade_tbl()` functions:
 
-```{r re-check-seg_risk_vars}
-risk_grade_tbl <- seg_risk_grade_tbl(risk_vars = risk_vars_tbl)
-risk_grade_tbl
-```
+*   The risk grade table doesn't necessarily require that we test the entire table structure--we can focus on the specific columns we care about in the output (like `Number of Pairs`)
 
-The risk grade table doesn't necessarily require that we test the entire table structure--we can focus on the specific columns we care about in the output (like `Number of Pairs`)
+    *   `testthat::expect_equal()` uses the `waldo` package to make comparisons, so I'll use that first here to check the `Number of Pairs` columns
 
-`testthat::expect_equal()` uses the `waldo` package to make comparisons, so I'll use that first here to check the `Number of Pairs` columns:
-
-```{r , eval=TRUE}
-waldo::compare(
-  x = risk_grade_tbl$`Number of Pairs`, 
-  y = app_risk_grade_tbl$`Number of Pairs`
-)
-```
+    ```{r , eval=TRUE}
+    waldo::compare(
+      x = risk_grade_tbl$`Number of Pairs`, 
+      y = app_risk_grade_tbl$`Number of Pairs`
+    )
+    ```
 
 
-Now we can formally test the columns using `testthat::expect_equal()` and limit testing to only the `Number of Pairs` column:
+*   Now we can formally test the columns using `testthat::expect_equal()` and limit testing to only the `Number of Pairs` column
 
-```{r , eval=TRUE}
-testthat::test_that("Test risk grade table", {
-testthat::expect_equal(
-  # function table
-  object = risk_grade_tbl$`Number of Pairs`, 
-  # application table
-  expected = app_risk_grade_tbl$`Number of Pairs`
-  )
-})
-```
+    ```{r , eval=TRUE}
+    testthat::test_that("Test risk grade table", {
+    testthat::expect_equal(
+      # function table
+      object = risk_grade_tbl$`Number of Pairs`, 
+      # application table
+      expected = app_risk_grade_tbl$`Number of Pairs`
+      )
+    })
+    ```

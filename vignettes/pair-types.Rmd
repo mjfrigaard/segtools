@@ -53,10 +53,11 @@ library(waldo)
 library(diffobj)
 ```
 
-The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+The risk tables are created using the functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
 
-This vignette covers the development of the pair type table function, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+## Objective
 
+This vignette covers the the pair type table function and performs unit tests to ensure the output from the `seg_pair_type_tbl()` function match the output table in the [application](https://www.diabetestechnology.org/seg/). 
 
 ## Load test data
 
@@ -72,9 +73,9 @@ test_vand_comp_data <-
 glimpse(test_vand_comp_data)
 ```
 
-# Application (version 1.3.3) functions 
+### Application (version 1.3.3) functions 
 
-Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
+The previous application functions are stored in the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the GitHub repo.
 
 # SEG Risk Variables 
 
@@ -87,9 +88,9 @@ dplyr::glimpse(risk_vars_tbl)
 
 # Pair Type Table 
 
-[The original `pairtypeTable()` function](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL217C3-L217C3) is below:
+The original `pairtypeTable()` function is stored in the application [`helpers.R` file.](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL217C3-L217C3) 
 
-```{r original-pairtypeTable, eval=FALSE}
+```{r original-pairtypeTable, eval=FALSE, echo=FALSE}
 pairtypeTable <- function(dat) {
   # 2.1.1 - import data frame/define SampMeasData ----
   SampMeasData <- readr::read_csv(dat)
@@ -159,11 +160,13 @@ pairtypeTable <- function(dat) {
 }
 ```
 
-I've re-written this as `seg_pair_type_tbl()`
+
 
 ### `seg_pair_type_tbl()`
 
-```{r seg_pair_type_tbl}
+I've re-written `pairtypeTable()` as `seg_pair_type_tbl()`
+
+```{r seg_pair_type_tbl, echo=FALSE}
 seg_pair_type_tbl <- function(df) {
   # manipulate data directly 
   samp_meas_data <- dplyr::mutate(.data = df, 
@@ -229,13 +232,17 @@ seg_pair_type_tbl <- function(df) {
 }
 ```
 
-When I test this function on the `full_sample_repo` data (`VanderbiltComplete.csv`), I see the following:
+When I check `seg_pair_type_tbl()` on the `test_vand_comp_data` (`VanderbiltComplete.csv`) data, I see the following:
 
-```{r run-seg_pair_type_tbl}
+```{r check-seg_pair_type_tbl, eval=FALSE}
 seg_pair_type_tbl(df = test_vand_comp_data)
 ```
 
-### Application `PairTypeTable`
+```{r kable-check-seg_pair_type_tbl, echo=FALSE}
+knitr::kable(seg_pair_type_tbl(df = test_vand_comp_data))
+```
+
+## Application `PairTypeTable`
 
 After uploading `VanderbiltComplete.csv`, the first table in the **Summary Tables** tab is the pairs table: 
 
@@ -259,6 +266,7 @@ app_pairs_tbl = tibble::as_tibble(data.frame(
   ),
   Count = c(9891L, 4710L, 479L, 4702L, 23L, 9868L)
 ))
+app_pairs_tbl
 ```
 
 ```{r kable-app_pairs_tbl, echo=FALSE}
@@ -278,7 +286,7 @@ app_pairs_tbl = tibble::as_tibble(data.frame(
 knitr::kable(app_pairs_tbl)
 ```
 
-# Test 
+### Test 
 
 To test if the two tables are identical, I use `testthat`'s `testthat::expect_equal()` function, with `object` set to `seg_pair_type_tbl(dat = test_vand_comp_data)` and `expected` set to `app_pairs_tbl`.
 

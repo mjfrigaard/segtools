@@ -53,10 +53,11 @@ library(waldo)
 library(diffobj)
 ```
 
-The risk tables are created using three functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
+The risk tables are created using the functions in the [seg-shiny-1-3-3](https://github.com/quesgen/seg-shiny-1-3-3/tree/master) repo. Through the multiple iterations of this application, different values have been used to establish these categories. 
 
-This vignette covers the development of the ISO range table function, and performs unit tests on the values from the `segtools` functions to match the output in the [application](https://www.diabetestechnology.org/seg/). 
+## Objective
 
+This vignette covers the ISO range table function and performs unit tests on the output table to ensure it matches the table in the output in the [application](https://www.diabetestechnology.org/seg/).
 
 ## Load test data
 
@@ -72,7 +73,7 @@ test_vand_comp_data <-
 glimpse(test_vand_comp_data)
 ```
 
-# Application (version 1.3.3) functions 
+### Application (version 1.3.3) functions 
 
 Below are the three functions from the [`helpers.R` file](https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R) in the application repo.
 
@@ -85,16 +86,15 @@ risk_vars_tbl <- seg_risk_vars(df = test_vand_comp_data)
 dplyr::glimpse(risk_vars_tbl)
 ```
 
-
 # ISO Range Table 
 
-[The `ISORangeTable5` table](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#LL828C32-L828C46) is also created in the server function in the `App.R` file.
+The `ISORangeTable5` table is also created in the [server function](https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#LL828C32-L828C46) in the `App.R` file.
 
 ## `seg_iso_range_tbl()`
 
 I've re-written this below as `seg_iso_range_tbl()`:
 
-```{r seg_iso_range_tbl}
+```{r seg_iso_range_tbl, echo=FALSE}
 seg_iso_range_tbl <- function(risk_vars) {
 
   lkpISORanges <- tibble::tribble(
@@ -141,7 +141,7 @@ seg_iso_range_tbl <- function(risk_vars) {
 seg_iso_range_tbl(risk_vars_tbl)
 ```
 
-#### Application `ISORangeTable`
+## Application `ISORangeTable`
 
 Below is the output for the `ISORangeTable` in the application
 
@@ -175,7 +175,7 @@ app_iso_range_tbl <- tibble::tribble(
 knitr::kable(app_iso_range_tbl)
 ```
 
-#### Test 
+### Test 
 
 Below we test the two `ISORangeTable` tables
 
