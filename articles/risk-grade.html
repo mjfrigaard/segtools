@@ -103,9 +103,13 @@
 <p>The risk tables are created using three functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
 repo. Through the multiple iterations of this application, different
 values have been used to establish these categories.</p>
-<p>This vignette covers the development of the risk grade table function
-and look-up table, and performs unit tests on the values from the
-<code>segtools</code> functions to match the output in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+<div class="section level2">
+<h2 id="objective">Objective<a class="anchor" aria-label="anchor" href="#objective"></a>
+</h2>
+<p>This vignette covers the risk grade table function
+(<code><a href="../reference/seg_risk_grade_tbl.html">seg_risk_grade_tbl()</a></code>), including unit tests and
+comparisons of the output from <code><a href="../reference/seg_risk_grade_tbl.html">seg_risk_grade_tbl()</a></code> to the
+output in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
 <div class="section level3">
 <h3 id="load-test-data">Load test data<a class="anchor" aria-label="anchor" href="#load-test-data"></a>
 </h3>
@@ -126,16 +130,22 @@ in the shiny app to generate the tables for comparison.</p>
 <span><span class="co">#&gt; Columns: 2</span></span>
 <span><span class="co">#&gt; $ BGM <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 121, 212, 161, 191, 189, 104, 293, 130, 261, 147, 83, 132, 146, 24…</span></span>
 <span><span class="co">#&gt; $ REF <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 127, 223, 166, 205, 210, 100, 296, 142, 231, 148, 81, 131, 155, 25…</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
-</h2>
-<p>Below are the three functions from the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
+<div class="section level4">
+<h4 id="application-version-1-3-3-helper-functions">Application (version 1.3.3) helper functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-helper-functions"></a>
+</h4>
+<p>The previous risk grade table functions come from the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
 file</a> in the application repo.</p>
 </div>
+</div>
+</div>
 <div class="section level2">
-<h2 id="seg-risk-variables">SEG Risk Variables<a class="anchor" aria-label="anchor" href="#seg-risk-variables"></a>
+<h2 id="risk-grade-table">Risk Grade Table<a class="anchor" aria-label="anchor" href="#risk-grade-table"></a>
 </h2>
+<p>The <code>RiskGradeTable3</code> is also created in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L728" class="external-link">server
+function of the previous application</a>.</p>
+<div class="section level3">
+<h3 id="seg-risk-variables">SEG Risk Variables<a class="anchor" aria-label="anchor" href="#seg-risk-variables"></a>
+</h3>
 <p>Create the <code>risk_vars_tbl</code> from
 <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code>:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
@@ -163,56 +173,15 @@ file</a> in the application repo.</p>
 <span><span class="co">#&gt; $ risk_grade     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", …</span></span>
 <span><span class="co">#&gt; $ risk_grade_txt <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", …</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="risk-grade-table">Risk Grade Table<a class="anchor" aria-label="anchor" href="#risk-grade-table"></a>
-</h2>
-<p>The <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L728" class="external-link"><code>RiskGradeTable3</code></a>
-is also created in the server, which I’ve wrapped into a function:</p>
+<div class="section level3">
+<h3 id="seg_risk_grade_tbl">
+<code>seg_risk_grade_tbl()</code><a class="anchor" aria-label="anchor" href="#seg_risk_grade_tbl"></a>
+</h3>
+<p>I’ve re-written the previous server code into the
+<code><a href="../reference/seg_risk_grade_tbl.html">seg_risk_grade_tbl()</a></code> function:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_risk_grade_tbl</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">risk_vars</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">risk_grade_cnts</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">risk_vars</span>,</span>
-<span>    <span class="va">risk_grade</span>,</span>
-<span>    sort <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">lkpRiskGrade</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
-<span>      risk_grade_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">3</span>, <span class="fl">4</span>, <span class="fl">5</span><span class="op">)</span>,</span>
-<span>      risk_grade <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span>, <span class="st">"E"</span><span class="op">)</span>,</span>
-<span>      REF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"0 - 0.5"</span>, <span class="st">"&gt; 0.5 - 1.0"</span>, <span class="st">"&gt; 1.0 - 2.0"</span>, <span class="st">"&gt; 2.0 - 3.0"</span>, <span class="st">"&gt; 3.0"</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="va">risk_grade_joined</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">risk_grade_cnts</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">lkpRiskGrade</span>,</span>
-<span>    by <span class="op">=</span> <span class="st">"risk_grade"</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># change lkp table variables</span></span>
-<span>  <span class="va">risk_grade_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    .data <span class="op">=</span> <span class="va">risk_grade_joined</span>,</span>
-<span>    risk_grade_id <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">risk_grade_id</span><span class="op">)</span>,</span>
-<span>    Percent <span class="op">=</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>      <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">risk_vars</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>,</span>
-<span>        digits <span class="op">=</span> <span class="fl">1</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span>condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
-<span>        true <span class="op">=</span> <span class="st">""</span>, false <span class="op">=</span> <span class="st">"%"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="co"># rename variables</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
-<span>      ID <span class="op">=</span> <span class="va">risk_grade_id</span>,</span>
-<span>      `Risk Grade` <span class="op">=</span> <span class="va">risk_grade</span>,</span>
-<span>      `Number of Pairs` <span class="op">=</span> <span class="va">n</span>,</span>
-<span>      <span class="va">Percent</span>,</span>
-<span>      <span class="co"># `REF Range` = REF</span></span>
-<span>      `Risk Factor Range` <span class="op">=</span> <span class="va">REF</span></span>
-<span>    <span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">risk_grade_vars_tbl</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_risk_grade_tbl.html">seg_risk_grade_tbl</a></span><span class="op">(</span>risk_vars <span class="op">=</span> <span class="va">risk_vars_tbl</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">risk_grade_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_risk_grade_tbl.html">seg_risk_grade_tbl</a></span><span class="op">(</span>risk_vars <span class="op">=</span> <span class="va">risk_vars_tbl</span><span class="op">)</span></span>
+<span><span class="va">risk_grade_tbl</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="right">ID</th>
@@ -259,14 +228,32 @@ is also created in the server, which I’ve wrapped into a function:</p>
 </tr>
 </tbody>
 </table>
-<p>I’ll compare this to the application output below:</p>
-<div class="section level4">
-<h4 id="application-riskgradetable">Application <code>RiskGradeTable</code><a class="anchor" aria-label="anchor" href="#application-riskgradetable"></a>
-</h4>
+<p><br></p>
+<p>The <strong>Risk Factor Range</strong> values comes from the table in
+the <a href="https://pubmed.ncbi.nlm.nih.gov/25562886/" class="external-link">Surveillance
+Error Grid paper.</a></p>
+<p><br></p>
+<div class="figure" style="text-align: center">
+<img src="../reference/figures/2014-risk-zones-paper.png" alt="J Diabetes Sci Technol. 2014 Jul;8(4):658-72. doi: 10.1177/1932296814539589." width="80%"><p class="caption">
+J Diabetes Sci Technol. 2014 Jul;8(4):658-72. doi:
+10.1177/1932296814539589.
+</p>
+</div>
+<p><br></p>
+<p>I’ll compare this to the application output (using the same test
+data) below:</p>
+</div>
+<div class="section level3">
+<h3 id="application-riskgradetable">Application <code>RiskGradeTable</code><a class="anchor" aria-label="anchor" href="#application-riskgradetable"></a>
+</h3>
+<p><br></p>
 <p><img src="../reference/figures/vand_comp_risk_grade.png" width="100%"></p>
-<p>But I can build it manually and wrap the output <code>tibble</code>
-in the <code>data.frame</code>).</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p><br></p>
+<p>I’ll build the image output above manually and wrap the output
+<code>tibble</code> in the <code>data.frame</code> as
+<code>app_risk_grade_tbl</code></p>
+<p><br></p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_risk_grade_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span></span>
 <span>  <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span></span>
 <span>    ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1L</span>, <span class="fl">2L</span>, <span class="fl">3L</span>, <span class="fl">4L</span>, <span class="fl">5L</span><span class="op">)</span>,</span>
@@ -277,8 +264,10 @@ in the <code>data.frame</code>).</p>
 <span>      <span class="st">'&gt; 2.5 - 3.5'</span>, <span class="st">'&gt; 3.5'</span><span class="op">)</span>,</span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<p><br></p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_risk_grade_tbl</span></span></code></pre></div>
+<p><br></p>
 <table class="table">
 <thead><tr class="header">
 <th align="right">ID</th>
@@ -330,35 +319,31 @@ in the <code>data.frame</code>).</p>
 <div class="section level2">
 <h2 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
 </h2>
-<p>Now I test the <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code> and
+<p>Below I’ll test the <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code> and
 <code><a href="../reference/seg_risk_grade_tbl.html">seg_risk_grade_tbl()</a></code> functions:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">risk_grade_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_risk_grade_tbl.html">seg_risk_grade_tbl</a></span><span class="op">(</span>risk_vars <span class="op">=</span> <span class="va">risk_vars_tbl</span><span class="op">)</span></span>
-<span><span class="va">risk_grade_tbl</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 5</span></span></span>
-<span><span class="co">#&gt;      ID `Risk Grade` `Number of Pairs` Percent `Risk Factor Range`</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>              </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     1 A                         <span style="text-decoration: underline;">9</span>474 96%     0 - 0.5            </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     2 B                          349 3.5%    &gt; 0.5 - 1.0        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 C                           35 0.4%    &gt; 1.0 - 2.0        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4 D                           10 0.1%    &gt; 2.0 - 3.0        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5 E                           <span style="color: #BB0000;">NA</span> NA      &gt; 3.0</span></span></code></pre></div>
+<ul>
+<li>
 <p>The risk grade table doesn’t necessarily require that we test the
 entire table structure–we can focus on the specific columns we care
 about in the output (like <code>Number of Pairs</code>)</p>
-<p><code><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">testthat::expect_equal()</a></code> uses the <code>waldo</code>
+<ul>
+<li>
+<code><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">testthat::expect_equal()</a></code> uses the <code>waldo</code>
 package to make comparisons, so I’ll use that first here to check the
-<code>Number of Pairs</code> columns:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code>Number of Pairs</code> columns</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">waldo</span><span class="fu">::</span><span class="fu"><a href="https://waldo.r-lib.org/reference/compare.html" class="external-link">compare</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">risk_grade_tbl</span><span class="op">$</span><span class="va">`Number of Pairs`</span>, </span>
 <span>  y <span class="op">=</span> <span class="va">app_risk_grade_tbl</span><span class="op">$</span><span class="va">`Number of Pairs`</span></span>
 <span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No differences</span></span></code></pre></div>
+</li>
+<li>
 <p>Now we can formally test the columns using
 <code><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">testthat::expect_equal()</a></code> and limit testing to only the
-<code>Number of Pairs</code> column:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code>Number of Pairs</code> column</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span><span class="st">"Test risk grade table"</span>, <span class="op">{</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span></span>
 <span>  <span class="co"># function table</span></span>
@@ -367,7 +352,9 @@ package to make comparisons, so I’ll use that first here to check the
 <span>  expected <span class="op">=</span> <span class="va">app_risk_grade_tbl</span><span class="op">$</span><span class="va">`Number of Pairs`</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 😸</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🥇</span></span></code></pre></div>
+</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

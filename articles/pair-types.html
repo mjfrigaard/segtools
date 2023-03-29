@@ -100,12 +100,17 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://waldo.r-lib.org" class="external-link">waldo</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/diffobj" class="external-link">diffobj</a></span><span class="op">)</span></span></code></pre></div>
-<p>The risk tables are created using three functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
+<p>The risk tables are created using the functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
 repo. Through the multiple iterations of this application, different
 values have been used to establish these categories.</p>
-<p>This vignette covers the development of the pair type table function,
-and performs unit tests on the values from the <code>segtools</code>
-functions to match the output in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+<div class="section level3">
+<h3 id="objective">Objective<a class="anchor" aria-label="anchor" href="#objective"></a>
+</h3>
+<p>This vignette covers the the pair type table function and performs
+unit tests to ensure the output from the
+<code><a href="../reference/seg_pair_type_tbl.html">seg_pair_type_tbl()</a></code> function match the output table in the
+<a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+</div>
 <div class="section level3">
 <h3 id="load-test-data">Load test data<a class="anchor" aria-label="anchor" href="#load-test-data"></a>
 </h3>
@@ -126,12 +131,12 @@ in the shiny app to generate the tables for comparison.</p>
 <span><span class="co">#&gt; Columns: 2</span></span>
 <span><span class="co">#&gt; $ BGM <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 121, 212, 161, 191, 189, 104, 293, 130, 261, 147, 83, 132, 146, 24…</span></span>
 <span><span class="co">#&gt; $ REF <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 127, 223, 166, 205, 210, 100, 296, 142, 231, 148, 81, 131, 155, 25…</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
+</h4>
+<p>The previous application functions are stored in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
+file</a> in the GitHub repo.</p>
 </div>
-<div class="section level2">
-<h2 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
-</h2>
-<p>Below are the three functions from the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
-file</a> in the application repo.</p>
 </div>
 <div class="section level2">
 <h2 id="seg-risk-variables">SEG Risk Variables<a class="anchor" aria-label="anchor" href="#seg-risk-variables"></a>
@@ -166,179 +171,20 @@ file</a> in the application repo.</p>
 <div class="section level2">
 <h2 id="pair-type-table">Pair Type Table<a class="anchor" aria-label="anchor" href="#pair-type-table"></a>
 </h2>
-<p><a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL217C3-L217C3" class="external-link">The
-original <code>pairtypeTable()</code> function</a> is below:</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>pairtypeTable <span class="ot">&lt;-</span> <span class="cf">function</span>(dat) {</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2.1.1 - import data frame/define SampMeasData ----</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  SampMeasData <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(dat)</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2.1.2 - convert the columns to numeric  ----</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  SampMeasData <span class="ot">&lt;-</span> SampMeasData <span class="sc">|&gt;</span> </span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="at">BGM =</span> <span class="fu">as.double</span>(BGM),</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>                  <span class="at">REF =</span> <span class="fu">as.double</span>(REF <span class="sc">|&gt;</span> </span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2.2 create bgm_pair_cat ---- </span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">bgm_pair_cat =</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>        BGM <span class="sc">&lt;</span> REF <span class="sc">~</span> <span class="st">"BGM &lt; REF"</span>,</span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>        BGM <span class="sc">==</span> REF <span class="sc">~</span> <span class="st">"BGM = REF"</span>,</span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a>        BGM <span class="sc">&gt;</span> REF <span class="sc">~</span> <span class="st">"BGM &gt; REF"</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2.3 create excluded ---- </span></span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">excluded =</span></span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>        REF <span class="sc">&gt;</span> <span class="dv">600</span> <span class="sc">~</span> <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>        <span class="cn">TRUE</span> <span class="sc">~</span> <span class="cn">NA_character_</span></span>
-<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span> </span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>    <span class="co"># 2.4 create included ---- </span></span>
-<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
-<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    <span class="at">included =</span></span>
-<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>      dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>        REF <span class="sc">&lt;=</span> <span class="dv">600</span> <span class="sc">~</span> <span class="st">"Total included in SEG Analysis"</span>,</span>
-<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>        REF <span class="sc">&gt;</span> <span class="dv">600</span> <span class="sc">~</span> <span class="st">"Total excluded in SEG Analysis"</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>      )</span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2.5 create BGMPairs ----</span></span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  BGMPairs <span class="ot">&lt;-</span> SampMeasData  <span class="sc">|&gt;</span> </span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">count</span>(bgm_pair_cat)  <span class="sc">|&gt;</span> </span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">rename</span>(</span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Pair Type</span><span class="st">`</span> <span class="ot">=</span> bgm_pair_cat,</span>
-<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>      <span class="at">Count =</span> n</span>
-<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2.6 create Excluded ----</span></span>
-<span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a>  Excluded <span class="ot">&lt;-</span> SampMeasData  <span class="sc">|&gt;</span> </span>
-<span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">count</span>(excluded) <span class="sc">|&gt;</span> </span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">rename</span>(</span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Pair Type</span><span class="st">`</span> <span class="ot">=</span> excluded,</span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>      <span class="at">Count =</span> n</span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>    )  <span class="sc">|&gt;</span> </span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="sc">!</span><span class="fu">is.na</span>(<span class="st">`</span><span class="at">Pair Type</span><span class="st">`</span>))</span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2.7 create Included ----</span></span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  Included <span class="ot">&lt;-</span> SampMeasData  <span class="sc">|&gt;</span> </span>
-<span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">count</span>(included)  <span class="sc">|&gt;</span> %</span>
-<span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">rename</span>(</span>
-<span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Pair Type</span><span class="st">`</span> <span class="ot">=</span> included,</span>
-<span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a>      <span class="at">Count =</span> n</span>
-<span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span> </span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">filter</span>(<span class="st">`</span><span class="at">Pair Type</span><span class="st">`</span> <span class="sc">==</span> <span class="st">"Total included in SEG Analysis"</span>)</span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2.8 create PairTypeTable ----</span></span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>  PairTypeTable <span class="ot">&lt;-</span> dplyr<span class="sc">::</span><span class="fu">bind_rows</span>(BGMPairs, </span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>                                    Excluded, </span>
-<span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a>                                    Included)</span>
-<span id="cb4-60"><a href="#cb4-60" aria-hidden="true" tabindex="-1"></a>  <span class="co"># 2.9 add the Total row  ----</span></span>
-<span id="cb4-61"><a href="#cb4-61" aria-hidden="true" tabindex="-1"></a>  PairTypeTable <span class="ot">&lt;-</span> PairTypeTable <span class="sc">|&gt;</span> tibble<span class="sc">::</span><span class="fu">add_row</span>(</span>
-<span id="cb4-62"><a href="#cb4-62" aria-hidden="true" tabindex="-1"></a>    <span class="st">`</span><span class="at">Pair Type</span><span class="st">`</span> <span class="ot">=</span> <span class="st">"Total"</span>,</span>
-<span id="cb4-63"><a href="#cb4-63" aria-hidden="true" tabindex="-1"></a>    <span class="at">Count =</span> <span class="fu">nrow</span>(SampMeasData),</span>
-<span id="cb4-64"><a href="#cb4-64" aria-hidden="true" tabindex="-1"></a>    <span class="at">.after =</span> <span class="dv">0</span></span>
-<span id="cb4-65"><a href="#cb4-65" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb4-66"><a href="#cb4-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">return</span>(PairTypeTable)</span>
-<span id="cb4-67"><a href="#cb4-67" aria-hidden="true" tabindex="-1"></a><span class="er">}</span></span></code></pre></div>
-<p>I’ve re-written this as <code><a href="../reference/seg_pair_type_tbl.html">seg_pair_type_tbl()</a></code></p>
+<p>The original <code>pairtypeTable()</code> function is stored in the
+application <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#LL217C3-L217C3" class="external-link"><code>helpers.R</code>
+file.</a></p>
 <div class="section level4">
 <h4 id="seg_pair_type_tbl">
 <code>seg_pair_type_tbl()</code><a class="anchor" aria-label="anchor" href="#seg_pair_type_tbl"></a>
 </h4>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_pair_type_tbl</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="co"># manipulate data directly </span></span>
-<span>  <span class="va">samp_meas_data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>.data <span class="op">=</span> <span class="va">df</span>, </span>
-<span>      BGM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">BGM</span><span class="op">)</span>,</span>
-<span>      REF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">REF</span><span class="op">)</span>,</span>
-<span>    <span class="co"># create bgm_pair_cat ----</span></span>
-<span>    bgm_pair_cat <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">BGM</span> <span class="op">&lt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &lt; REF"</span>,</span>
-<span>        <span class="va">BGM</span> <span class="op">==</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM = REF"</span>,</span>
-<span>        <span class="va">BGM</span> <span class="op">&gt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &gt; REF"</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    <span class="co"># create excluded ---- </span></span>
-<span>    excluded <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
-<span>        <span class="cn">TRUE</span> <span class="op">~</span> <span class="cn">NA_character_</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>    <span class="co"># create included ---- </span></span>
-<span>    included <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total included in SEG Analysis"</span>,</span>
-<span>        <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total excluded in SEG Analysis"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># create bgm_pair_cnt_tbl ----</span></span>
-<span>  <span class="va">bgm_pair_cnt_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">samp_meas_data</span>, </span>
-<span>    <span class="va">bgm_pair_cat</span><span class="op">)</span></span>
-<span>  <span class="co"># create bgm_pairs_tbl ----</span></span>
-<span>  <span class="va">bgm_pairs_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>.data <span class="op">=</span> <span class="va">bgm_pair_cnt_tbl</span>, </span>
-<span>                      `Pair Type` <span class="op">=</span> <span class="va">bgm_pair_cat</span>,</span>
-<span>                      Count <span class="op">=</span> <span class="va">n</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># create excluded_cnts_tbl ----</span></span>
-<span>  <span class="va">excluded_cnts_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">samp_meas_data</span>, <span class="va">excluded</span><span class="op">)</span> </span>
-<span>  <span class="co"># create excluded_pairs_tbl ----</span></span>
-<span>  <span class="va">excluded_pairs_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="va">excluded_cnts_tbl</span>,</span>
-<span>      `Pair Type` <span class="op">=</span> <span class="va">excluded</span>,</span>
-<span>      Count <span class="op">=</span> <span class="va">n</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">`Pair Type`</span><span class="op">)</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># create Included ----</span></span>
-<span>  <span class="va">included_cnts_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">samp_meas_data</span>, <span class="va">included</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="va">included_pairs_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span><span class="va">included_cnts_tbl</span>,</span>
-<span>      `Pair Type` <span class="op">=</span> <span class="va">included</span>,</span>
-<span>      Count <span class="op">=</span> <span class="va">n</span></span>
-<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">`Pair Type`</span> <span class="op">==</span> <span class="st">"Total included in SEG Analysis"</span><span class="op">)</span></span>
-<span>  </span>
-<span>  <span class="co"># 2.8 create pair_types ----</span></span>
-<span>  <span class="va">pair_types</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">bgm_pairs_tbl</span>, </span>
-<span>                                    <span class="va">excluded_pairs_tbl</span>, </span>
-<span>                                    <span class="va">included_pairs_tbl</span><span class="op">)</span></span>
-<span>  <span class="co"># 2.9 add the Total row  ----</span></span>
-<span>  <span class="va">pair_type_tbl</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/add_row.html" class="external-link">add_row</a></span><span class="op">(</span><span class="va">pair_types</span>,</span>
-<span>    `Pair Type` <span class="op">=</span> <span class="st">"Total"</span>,</span>
-<span>    Count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">samp_meas_data</span><span class="op">)</span>,</span>
-<span>    .after <span class="op">=</span> <span class="fl">0</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">pair_type_tbl</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>When I test this function on the <code>full_sample_repo</code> data
-(<code>VanderbiltComplete.csv</code>), I see the following:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_pair_type_tbl.html">seg_pair_type_tbl</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 6 × 2</span></span></span>
-<span><span class="co">#&gt;   `Pair Type`                           Count</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                 <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> Total                                  <span style="text-decoration: underline;">9</span>891</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> BGM &lt; REF                              <span style="text-decoration: underline;">4</span>710</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> BGM = REF                               479</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> BGM &gt; REF                              <span style="text-decoration: underline;">4</span>702</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> REF &gt; 600: Excluded from SEG Analysis    23</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">6</span> Total included in SEG Analysis         <span style="text-decoration: underline;">9</span>868</span></span></code></pre></div>
-</div>
-<div class="section level4">
-<h4 id="application-pairtypetable">Application <code>PairTypeTable</code><a class="anchor" aria-label="anchor" href="#application-pairtypetable"></a>
-</h4>
-<p>After uploading <code>VanderbiltComplete.csv</code>, the first table
-in the <strong>Summary Tables</strong> tab is the pairs table:</p>
-<p><img src="../reference/figures/vand_comp_pair_type.png" width="50%" style="display: block; margin: auto;"></p>
-<p>I’ve also stored these as <code>app_pairs_tbl</code>:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">app_pairs_tbl</span> <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  check.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  `Pair Type` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
-<span>    <span class="st">"Total"</span>,</span>
-<span>    <span class="st">"BGM &lt; REF"</span>,</span>
-<span>    <span class="st">"BGM = REF"</span>,</span>
-<span>    <span class="st">"BGM &gt; REF"</span>,</span>
-<span>    <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
-<span>    <span class="st">"Total included in SEG Analysis"</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  Count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9891L</span>, <span class="fl">4710L</span>, <span class="fl">479L</span>, <span class="fl">4702L</span>, <span class="fl">23L</span>, <span class="fl">9868L</span><span class="op">)</span></span>
-<span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>I’ve re-written <code>pairtypeTable()</code> as
+<code><a href="../reference/seg_pair_type_tbl.html">seg_pair_type_tbl()</a></code></p>
+<p>When I check <code><a href="../reference/seg_pair_type_tbl.html">seg_pair_type_tbl()</a></code> on the
+<code>test_vand_comp_data</code> (<code>VanderbiltComplete.csv</code>)
+data, I see the following:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_pair_type_tbl.html">seg_pair_type_tbl</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
 <thead><tr class="header">
 <th align="left">Pair Type</th>
@@ -372,16 +218,69 @@ in the <strong>Summary Tables</strong> tab is the pairs table:</p>
 </tbody>
 </table>
 </div>
-</div>
-<div class="section level2">
-<h2 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
-</h2>
+<div class="section level3">
+<h3 id="application-pairtypetable">Application <code>PairTypeTable</code><a class="anchor" aria-label="anchor" href="#application-pairtypetable"></a>
+</h3>
+<p>After uploading <code>VanderbiltComplete.csv</code>, the first table
+in the <strong>Summary Tables</strong> tab is the pairs table:</p>
+<p><img src="../reference/figures/vand_comp_pair_type.png" width="50%" style="display: block; margin: auto;"></p>
+<p>I’ve also stored these as <code>app_pairs_tbl</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">app_pairs_tbl</span> <span class="op">=</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
+<span>  stringsAsFactors <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  check.names <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  `Pair Type` <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
+<span>    <span class="st">"Total"</span>,</span>
+<span>    <span class="st">"BGM &lt; REF"</span>,</span>
+<span>    <span class="st">"BGM = REF"</span>,</span>
+<span>    <span class="st">"BGM &gt; REF"</span>,</span>
+<span>    <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
+<span>    <span class="st">"Total included in SEG Analysis"</span></span>
+<span>  <span class="op">)</span>,</span>
+<span>  Count <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">9891L</span>, <span class="fl">4710L</span>, <span class="fl">479L</span>, <span class="fl">4702L</span>, <span class="fl">23L</span>, <span class="fl">9868L</span><span class="op">)</span></span>
+<span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">app_pairs_tbl</span></span></code></pre></div>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Pair Type</th>
+<th align="right">Count</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Total</td>
+<td align="right">9891</td>
+</tr>
+<tr class="even">
+<td align="left">BGM &lt; REF</td>
+<td align="right">4710</td>
+</tr>
+<tr class="odd">
+<td align="left">BGM = REF</td>
+<td align="right">479</td>
+</tr>
+<tr class="even">
+<td align="left">BGM &gt; REF</td>
+<td align="right">4702</td>
+</tr>
+<tr class="odd">
+<td align="left">REF &gt; 600: Excluded from SEG Analysis</td>
+<td align="right">23</td>
+</tr>
+<tr class="even">
+<td align="left">Total included in SEG Analysis</td>
+<td align="right">9868</td>
+</tr>
+</tbody>
+</table>
+<div class="section level4">
+<h4 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
+</h4>
 <p>To test if the two tables are identical, I use
 <code>testthat</code>’s <code><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">testthat::expect_equal()</a></code> function,
 with <code>object</code> set to
 <code>seg_pair_type_tbl(dat = test_vand_comp_data)</code> and
 <code>expected</code> set to <code>app_pairs_tbl</code>.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span><span class="st">"Test seg_pair_type_tbl()"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span></span>
 <span>    <span class="co"># function table</span></span>
@@ -390,7 +289,9 @@ with <code>object</code> set to
 <span>    expected <span class="op">=</span> <span class="va">app_pairs_tbl</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 😀</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre></div>
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

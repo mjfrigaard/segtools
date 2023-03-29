@@ -100,12 +100,16 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://waldo.r-lib.org" class="external-link">waldo</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/diffobj" class="external-link">diffobj</a></span><span class="op">)</span></span></code></pre></div>
-<p>The risk tables are created using three functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
+<p>The risk tables are created using functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
 repo. Through the multiple iterations of this application, different
 values have been used to establish these categories.</p>
-<p>This vignette covers the development of the risk variables table, and
-performs unit tests on the values from the <code>segtools</code>
-functions to match the output in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+<div class="section level3">
+<h3 id="objective">Objective<a class="anchor" aria-label="anchor" href="#objective"></a>
+</h3>
+<p>This vignette covers the development of the risk variables and
+performs unit tests on the associated functions to ensure the output
+matches the tables in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+</div>
 <div class="section level3">
 <h3 id="load-test-data">Load test data<a class="anchor" aria-label="anchor" href="#load-test-data"></a>
 </h3>
@@ -126,148 +130,32 @@ in the shiny app to generate the tables for comparison.</p>
 <span><span class="co">#&gt; Columns: 2</span></span>
 <span><span class="co">#&gt; $ BGM <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 121, 212, 161, 191, 189, 104, 293, 130, 261, 147, 83, 132, 146, 24…</span></span>
 <span><span class="co">#&gt; $ REF <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 127, 223, 166, 205, 210, 100, 296, 142, 231, 148, 81, 131, 155, 25…</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
+</h4>
+<p>The previous application functions are stored in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
+file</a> in the GitHub repo.</p>
 </div>
-<div class="section level2">
-<h2 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
-</h2>
-<p>Below are the three functions from the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
-file</a> in the application repo.</p>
 </div>
 <div class="section level2">
 <h2 id="seg-risk-variables">SEG risk variables<a class="anchor" aria-label="anchor" href="#seg-risk-variables"></a>
 </h2>
 <p>The SEG variables were initially created with the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/helpers.R#L289" class="external-link"><code>segTable()</code>
-function</a>. I’ve included it below:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">segTable</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">dat</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>  <span class="co"># 3.1 - import data frame -----</span></span>
-<span>  <span class="va">SampMeasData</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/warning.html" class="external-link">suppressWarnings</a></span><span class="op">(</span><span class="fu">readr</span><span class="fu">::</span><span class="fu">read_csv</span><span class="op">(</span>file <span class="op">=</span> <span class="va">dat</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">SampMeasData</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>BGM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">BGM</span><span class="op">)</span>,</span>
-<span>                  REF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">REF</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span></span>
-<span>  <span class="co"># create bgm_pair_cat ---- </span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      bgm_pair_cat <span class="op">=</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">BGM</span> <span class="op">&lt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &lt; REF"</span>,</span>
-<span>          <span class="va">BGM</span> <span class="op">==</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM = REF"</span>,</span>
-<span>          <span class="va">BGM</span> <span class="op">&gt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &gt; REF"</span></span>
-<span>        <span class="op">)</span></span>
-<span>    <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>    <span class="co"># 3.3 create ref_pair_2cat ---- </span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      ref_pair_2cat <span class="op">=</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
-<span>          <span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">21</span> <span class="op">&amp;</span> <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &lt;21: Included in SEG Analysis"</span></span>
-<span>        <span class="op">)</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="co"># # 3.4 create included ---- </span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      included <span class="op">=</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total included in SEG Analysis"</span>,</span>
-<span>          <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total excluded in SEG Analysis"</span></span>
-<span>        <span class="op">)</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="co"># 3.5 join to RiskPairData ---- </span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">.</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">RiskPairData</span>,</span>
-<span>      by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BGM"</span>, <span class="st">"REF"</span><span class="op">)</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span> <span class="co"># 3.6 Create risk_cat variable ----</span></span>
-<span>      risk_cat <span class="op">=</span></span>
-<span>        <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval</a></span><span class="op">(</span></span>
-<span>          x <span class="op">=</span> <span class="va">abs_risk</span>, <span class="co"># the abs_risk absolute value</span></span>
-<span>          vec <span class="op">=</span> <span class="va">LookUpRiskCat</span><span class="op">$</span><span class="va">ABSLB</span>, <span class="co"># the lower bound absolute risk</span></span>
-<span>          left.open <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>        <span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span> <span class="co"># 3.7 Join to LookUpRiskCat data ---- </span></span>
-<span>      x <span class="op">=</span> <span class="va">.</span>, y <span class="op">=</span> <span class="va">LookUpRiskCat</span>, <span class="co"># inner join to look-up</span></span>
-<span>      by <span class="op">=</span> <span class="st">"risk_cat"</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      risk_cat_txt <span class="op">=</span> <span class="co"># text risk categories</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"None"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Slight, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"Slight, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"Moderate, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"Moderate, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"Severe, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Severe, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Extreme"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>      rel_diff <span class="op">=</span> <span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># relative diff</span></span>
-<span>      abs_rel_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">rel_diff</span><span class="op">)</span>, <span class="co"># abs relative diff</span></span>
-<span>      sq_rel_diff <span class="op">=</span> <span class="va">rel_diff</span><span class="op">^</span><span class="fl">2</span>,</span>
-<span>      iso_diff <span class="op">=</span></span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&gt;=</span> <span class="fl">100</span>, <span class="co"># condition 1</span></span>
-<span>        <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># T 1</span></span>
-<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">100</span>, <span class="co"># condition 2</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span>, <span class="co"># T 2</span></span>
-<span>          <span class="cn">NA_real_</span></span>
-<span>        <span class="op">)</span>, <span class="co"># F 2</span></span>
-<span>        <span class="cn">NA_real_</span></span>
-<span>      <span class="op">)</span>, <span class="co"># F1</span></span>
-<span>      iso_range <span class="op">=</span> <span class="co"># # 4.3.16 create iso range variable ----</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="co"># # A tibble: 5 x 2</span></span>
-<span>          <span class="co">#      ID iso_range</span></span>
-<span>          <span class="co">#   &lt;int&gt; &lt;chr&gt;</span></span>
-<span>          <span class="co"># 1     1 &lt;= 5% or 5 mg/dL</span></span>
-<span>          <span class="co"># 2     2 &gt; 5 - 10% or mg/dL</span></span>
-<span>          <span class="co"># 3     3 &gt; 10 - 15% or mg/dL</span></span>
-<span>          <span class="co"># 4     4 &gt; 15 - 20% mg/dL</span></span>
-<span>          <span class="co"># 5     5 &gt; 20% or 20 mg/dL</span></span>
-<span>        <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">5</span> <span class="op">~</span> <span class="st">"&lt;= 5% or 5 mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">5</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">10</span> <span class="op">~</span> <span class="st">"&gt; 5 - 10% or mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">10</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">15</span> <span class="op">~</span> <span class="st">"&gt; 10 - 15% or mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">15</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 15 - 20% mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 20% or 20 mg/dL"</span><span class="op">)</span>,</span>
-<span></span>
-<span>      risk_grade <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"A"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.0</span> <span class="op">~</span> <span class="st">"B"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"C"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"D"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"E"</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      risk_grade_txt <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"0 - 0.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.0</span> <span class="op">~</span> <span class="st">"&gt; 0.5 - 1.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"&gt; 1.0 - 2.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"&gt; 2.0 - 3.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"&gt; 3.0"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<div class="section level4">
-<h4 id="error">Error<a class="anchor" aria-label="anchor" href="#error"></a>
-</h4>
+function</a></p>
+<div class="section level3">
+<h3 id="error">Error<a class="anchor" aria-label="anchor" href="#error"></a>
+</h3>
 <p>When I try this with the <code>full_sample_repo</code>, I get the
 following error:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">segTable</span><span class="op">(</span>dat <span class="op">=</span> <span class="va">full_sample_repo</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Error in loadNamespace(x): there is no package called 'readr'</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="seg_risk_vars">
-<code>seg_risk_vars()</code><a class="anchor" aria-label="anchor" href="#seg_risk_vars"></a>
-</h2>
-<p>The <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code> functions splits the
-<code>segTable()</code> into two parts: risk category columns and ISO
-columns.</p>
-<div class="section level3">
-<h3 id="seg-risk-category-columns">SEG Risk Category Columns<a class="anchor" aria-label="anchor" href="#seg-risk-category-columns"></a>
-</h3>
+<p>I’ve split the previous <code>segTable()</code> function splits into
+into two parts: risk category columns (<code><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code>)
+and ISO columns (<code><a href="../reference/seg_iso_cols.html">seg_iso_cols()</a></code>).</p>
+<div class="section level4">
+<h4 id="seg-risk-category-columns">SEG Risk Category Columns<a class="anchor" aria-label="anchor" href="#seg-risk-category-columns"></a>
+</h4>
 <p>I’ll split <code>segTable()</code> into two parts to identify the
 bug:</p>
 <ul>
@@ -276,163 +164,35 @@ bug:</p>
 <code>AppLookUpRiskCat.csv</code> and <code>AppRiskPairData.csv</code>
 inside the function.</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_risk_cat_cols</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">github_data_root</span> <span class="op">&lt;-</span></span>
-<span>    <span class="st">"https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"</span></span>
-<span></span>
-<span>  <span class="co"># import LookUpRiskCat -----</span></span>
-<span>  <span class="va">app_lookup_repo</span> <span class="op">&lt;-</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>    <span class="va">github_data_root</span>,</span>
-<span>    <span class="st">"AppLookUpRiskCat.csv"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="va">LookUpRiskCat</span> <span class="op">&lt;-</span> <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">app_lookup_repo</span>, delim <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># import RiskPairData -----</span></span>
-<span>  <span class="va">app_riskpair_repo</span> <span class="op">&lt;-</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>    <span class="va">github_data_root</span>,</span>
-<span>    <span class="st">"AppRiskPairData.csv"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="va">RiskPairData</span> <span class="op">&lt;-</span> <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">app_riskpair_repo</span>, delim <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># directly manipulate df</span></span>
-<span>  <span class="va">bgm_ref_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">df</span>,</span>
-<span>    BGM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">BGM</span><span class="op">)</span>,</span>
-<span>    REF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">REF</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># create bgm_pair_cat ----</span></span>
-<span>  <span class="va">bgm_pair_cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">bgm_ref_tbl</span>,</span>
-<span>    bgm_pair_cat <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">BGM</span> <span class="op">&lt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &lt; REF"</span>,</span>
-<span>        <span class="va">BGM</span> <span class="op">==</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM = REF"</span>,</span>
-<span>        <span class="va">BGM</span> <span class="op">&gt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &gt; REF"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># create ref_pair_2cat ----</span></span>
-<span>  <span class="va">ref_pair_2cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">bgm_pair_cat_tbl</span>,</span>
-<span>    ref_pair_2cat <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
-<span>        <span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">21</span> <span class="op">&amp;</span> <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &lt;21: Included in SEG Analysis"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># create included ----</span></span>
-<span>  <span class="va">included_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">ref_pair_2cat_tbl</span>,</span>
-<span>    included <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total included in SEG Analysis"</span>,</span>
-<span>        <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total excluded in SEG Analysis"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># join to RiskPairData ----</span></span>
-<span>  <span class="va">risk_pair_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">included_tbl</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">RiskPairData</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BGM"</span>, <span class="st">"REF"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># Create risk_cat variable ----</span></span>
-<span>  <span class="va">risk_cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_pair_tbl</span>,</span>
-<span>    risk_cat <span class="op">=</span></span>
-<span>      <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval</a></span><span class="op">(</span></span>
-<span>        x <span class="op">=</span> <span class="va">abs_risk</span>, <span class="co"># the abs_risk absolute value</span></span>
-<span>        vec <span class="op">=</span> <span class="va">LookUpRiskCat</span><span class="op">$</span><span class="va">ABSLB</span>, <span class="co"># the lower bound absolute risk</span></span>
-<span>        left.open <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>      <span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># Join to LookUpRiskCat data ----</span></span>
-<span>  <span class="va">risk_cat_join_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">risk_cat_tbl</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">LookUpRiskCat</span>, <span class="co"># inner join to look-up</span></span>
-<span>    by <span class="op">=</span> <span class="st">"risk_cat"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># create text risk categories ----</span></span>
-<span>  <span class="va">seg_risk_cat_cols_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_cat_join_tbl</span>,</span>
-<span>      risk_cat_txt <span class="op">=</span> </span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"None"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Slight, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"Slight, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"Moderate, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"Moderate, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"Severe, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Severe, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Extreme"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">seg_risk_cat_cols_tbl</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>I test <code><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code> with
+<p>I check <code><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code> with the
 <code>test_vand_comp_data</code>:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 9,868 × 12</span></span></span>
-<span><span class="co">#&gt;      BGM   REF bgm_pair_cat ref_pair_2cat included         RiskPairID RiskFactor</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                 <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span>   121   127 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …      <span style="text-decoration: underline;">72</span>849    0.002<span style="text-decoration: underline;">54</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span>   212   223 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …     <span style="text-decoration: underline;">127</span>636    0.028<span style="text-decoration: underline;">0</span> </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span>   161   166 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …      <span style="text-decoration: underline;">96</span>928    0      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span>   191   205 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …     <span style="text-decoration: underline;">114</span>997    0.206  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span>   189   210 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …     <span style="text-decoration: underline;">113</span>800    0.209  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span>   104   100 BGM &gt; REF    <span style="color: #BB0000;">NA</span>            Total included …      <span style="text-decoration: underline;">62</span>605   -<span style="color: #BB0000;">0.125</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span>   293   296 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …     <span style="text-decoration: underline;">176</span>390    0      </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span>   130   142 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …      <span style="text-decoration: underline;">78</span>273    0.267  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span>   261   231 BGM &gt; REF    <span style="color: #BB0000;">NA</span>            Total included …     <span style="text-decoration: underline;">157</span>093   -<span style="color: #BB0000;">0.285</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span>   147   148 BGM &lt; REF    <span style="color: #BB0000;">NA</span>            Total included …      <span style="text-decoration: underline;">88</span>496    0      </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 9,858 more rows</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># ℹ 5 more variables: abs_risk &lt;dbl&gt;, risk_cat &lt;dbl&gt;, ABSLB &lt;dbl&gt;, ABSUB &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   risk_cat_txt &lt;chr&gt;</span></span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">risk_cat_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">risk_cat_vars</span><span class="op">)</span></span>
+<span><span class="co">#&gt; Rows: 9,868</span></span>
+<span><span class="co">#&gt; Columns: 12</span></span>
+<span><span class="co">#&gt; $ BGM           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 121, 212, 161, 191, 189, 104, 293, 130, 261, 147, 83, 13…</span></span>
+<span><span class="co">#&gt; $ REF           <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 127, 223, 166, 205, 210, 100, 296, 142, 231, 148, 81, 13…</span></span>
+<span><span class="co">#&gt; $ bgm_pair_cat  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "BGM &lt; REF", "BGM &lt; REF", "BGM &lt; REF", "BGM &lt; REF", "BGM…</span></span>
+<span><span class="co">#&gt; $ ref_pair_2cat <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, …</span></span>
+<span><span class="co">#&gt; $ included      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "Total included in SEG Analysis", "Total included in SEG…</span></span>
+<span><span class="co">#&gt; $ RiskPairID    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 72849, 127636, 96928, 114997, 113800, 62605, 176390, 782…</span></span>
+<span><span class="co">#&gt; $ RiskFactor    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.0025445, 0.0279900, 0.0000000, 0.2061100, 0.2086500, -…</span></span>
+<span><span class="co">#&gt; $ abs_risk      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.0025445, 0.0279900, 0.0000000, 0.2061100, 0.2086500, 0…</span></span>
+<span><span class="co">#&gt; $ risk_cat      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…</span></span>
+<span><span class="co">#&gt; $ ABSLB         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> -0.001, -0.001, -0.001, -0.001, -0.001, -0.001, -0.001, …</span></span>
+<span><span class="co">#&gt; $ ABSUB         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0…</span></span>
+<span><span class="co">#&gt; $ risk_cat_txt  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "None", "None", "None", "None", "None", "None", "None", …</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="seg-iso-range-columns">SEG ISO Range Columns<a class="anchor" aria-label="anchor" href="#seg-iso-range-columns"></a>
-</h3>
+<div class="section level4">
+<h4 id="seg-iso-range-columns">SEG ISO Range Columns<a class="anchor" aria-label="anchor" href="#seg-iso-range-columns"></a>
+</h4>
 <p><code><a href="../reference/seg_iso_cols.html">seg_iso_cols()</a></code> creates the ISO columns:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_iso_cols</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">risk_cat_cols</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">iso_cols_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_cat_cols</span>, </span>
-<span>      rel_diff <span class="op">=</span> <span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># relative diff</span></span>
-<span>      abs_rel_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">rel_diff</span><span class="op">)</span>, <span class="co"># abs relative diff</span></span>
-<span>      sq_rel_diff <span class="op">=</span> <span class="va">rel_diff</span><span class="op">^</span><span class="fl">2</span>,</span>
-<span>      iso_diff <span class="op">=</span></span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&gt;=</span> <span class="fl">100</span>, <span class="co"># condition 1</span></span>
-<span>        <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># T 1</span></span>
-<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">100</span>, <span class="co"># condition 2</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span>, <span class="co"># T 2</span></span>
-<span>          <span class="cn">NA_real_</span></span>
-<span>        <span class="op">)</span>, <span class="co"># F 2</span></span>
-<span>        <span class="cn">NA_real_</span></span>
-<span>      <span class="op">)</span>, <span class="co"># F1</span></span>
-<span>      iso_range <span class="op">=</span> <span class="co"># # 4.3.16 create iso range variable ----</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">5</span> <span class="op">~</span> <span class="st">"&lt;= 5% or 5 mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">5</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">10</span> <span class="op">~</span> <span class="st">"&gt; 5 - 10% or mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">10</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">15</span> <span class="op">~</span> <span class="st">"&gt; 10 - 15% or mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">15</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 15 - 20% mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 20% or 20 mg/dL"</span><span class="op">)</span>,</span>
-<span></span>
-<span>      risk_grade <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"A"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.0</span> <span class="op">~</span> <span class="st">"B"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"C"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"D"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"E"</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      risk_grade_txt <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"0 - 0.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.0</span> <span class="op">~</span> <span class="st">"&gt; 0.5 - 1.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"&gt; 1.0 - 2.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"&gt; 2.0 - 3.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"&gt; 3.0"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">iso_cols_tbl</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
 <p><code><a href="../reference/seg_iso_cols.html">seg_iso_cols()</a></code> accepts the output from
 <code><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code> and returns a dataset with all the
 risk/ISO variables.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">risk_cat_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span></span>
-<span><span class="va">iso_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_iso_cols.html">seg_iso_cols</a></span><span class="op">(</span>risk_cat_cols <span class="op">=</span> <span class="va">risk_cat_vars</span><span class="op">)</span></span>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">iso_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_iso_cols.html">seg_iso_cols</a></span><span class="op">(</span>risk_cat_cols <span class="op">=</span> <span class="va">risk_cat_vars</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://pillar.r-lib.org/reference/glimpse.html" class="external-link">glimpse</a></span><span class="op">(</span><span class="va">iso_vars_tbl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Rows: 9,868</span></span>
 <span><span class="co">#&gt; Columns: 19</span></span>
@@ -456,152 +216,19 @@ risk/ISO variables.</p>
 <span><span class="co">#&gt; $ risk_grade     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", …</span></span>
 <span><span class="co">#&gt; $ risk_grade_txt <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", …</span></span></code></pre></div>
 </div>
+</div>
 <div class="section level3">
-<h3 id="combine-seg-risk-category-and-iso-range-columns">Combine SEG Risk Category and ISO Range columns<a class="anchor" aria-label="anchor" href="#combine-seg-risk-category-and-iso-range-columns"></a>
+<h3 id="seg_risk_vars">
+<code>seg_risk_vars()</code><a class="anchor" aria-label="anchor" href="#seg_risk_vars"></a>
 </h3>
-<p><code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code> is a wrapper around
-<code><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code> and <code><a href="../reference/seg_iso_cols.html">seg_iso_cols()</a></code>:</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_risk_vars</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">seg_risk_cat_cols</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="va">github_data_root</span> <span class="op">&lt;-</span></span>
-<span>    <span class="st">"https://raw.githubusercontent.com/mjfrigaard/seg-shiny-data/master/Data/"</span></span>
-<span></span>
-<span>  <span class="co"># import LookUpRiskCat -----</span></span>
-<span>  <span class="va">app_lookup_repo</span> <span class="op">&lt;-</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>    <span class="va">github_data_root</span>,</span>
-<span>    <span class="st">"AppLookUpRiskCat.csv"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="va">LookUpRiskCat</span> <span class="op">&lt;-</span> <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">app_lookup_repo</span>, delim <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># import RiskPairData -----</span></span>
-<span>  <span class="va">app_riskpair_repo</span> <span class="op">&lt;-</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>    <span class="va">github_data_root</span>,</span>
-<span>    <span class="st">"AppRiskPairData.csv"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="va">RiskPairData</span> <span class="op">&lt;-</span> <span class="fu">vroom</span><span class="fu">::</span><span class="fu"><a href="https://vroom.r-lib.org/reference/vroom.html" class="external-link">vroom</a></span><span class="op">(</span>file <span class="op">=</span> <span class="va">app_riskpair_repo</span>, delim <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># directly manipulate df</span></span>
-<span>  <span class="va">bgm_ref_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">df</span>,</span>
-<span>    BGM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">BGM</span><span class="op">)</span>,</span>
-<span>    REF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">REF</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="co"># create bgm_pair_cat ----</span></span>
-<span>  <span class="va">bgm_pair_cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">bgm_ref_tbl</span>,</span>
-<span>    bgm_pair_cat <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">BGM</span> <span class="op">&lt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &lt; REF"</span>,</span>
-<span>        <span class="va">BGM</span> <span class="op">==</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM = REF"</span>,</span>
-<span>        <span class="va">BGM</span> <span class="op">&gt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &gt; REF"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># create ref_pair_2cat ----</span></span>
-<span>  <span class="va">ref_pair_2cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">bgm_pair_cat_tbl</span>,</span>
-<span>    ref_pair_2cat <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
-<span>        <span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">21</span> <span class="op">&amp;</span> <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &lt;21: Included in SEG Analysis"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># create included ----</span></span>
-<span>  <span class="va">included_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">ref_pair_2cat_tbl</span>,</span>
-<span>    included <span class="op">=</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total included in SEG Analysis"</span>,</span>
-<span>        <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total excluded in SEG Analysis"</span></span>
-<span>      <span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># join to RiskPairData ----</span></span>
-<span>  <span class="va">risk_pair_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">included_tbl</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">RiskPairData</span>,</span>
-<span>    by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BGM"</span>, <span class="st">"REF"</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># Create risk_cat variable ----</span></span>
-<span>  <span class="va">risk_cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_pair_tbl</span>,</span>
-<span>    risk_cat <span class="op">=</span></span>
-<span>      <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval</a></span><span class="op">(</span></span>
-<span>        x <span class="op">=</span> <span class="va">abs_risk</span>, <span class="co"># the abs_risk absolute value</span></span>
-<span>        vec <span class="op">=</span> <span class="va">LookUpRiskCat</span><span class="op">$</span><span class="va">ABSLB</span>, <span class="co"># the lower bound absolute risk</span></span>
-<span>        left.open <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>      <span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># Join to LookUpRiskCat data ----</span></span>
-<span>  <span class="va">risk_cat_join_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">risk_cat_tbl</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">LookUpRiskCat</span>, <span class="co"># inner join to look-up</span></span>
-<span>    by <span class="op">=</span> <span class="st">"risk_cat"</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="co"># create text risk categories ----</span></span>
-<span>  <span class="va">seg_risk_cat_cols_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_cat_join_tbl</span>,</span>
-<span>      risk_cat_txt <span class="op">=</span> </span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"None"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Slight, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"Slight, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"Moderate, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"Moderate, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"Severe, Lower"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Severe, Higher"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Extreme"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">seg_risk_cat_cols_tbl</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="va">risk_cat_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">seg_iso_cols</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">risk_cat_cols</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">iso_cols_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_cat_cols</span>, </span>
-<span>      rel_diff <span class="op">=</span> <span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># relative diff</span></span>
-<span>      abs_rel_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">rel_diff</span><span class="op">)</span>, <span class="co"># abs relative diff</span></span>
-<span>      sq_rel_diff <span class="op">=</span> <span class="va">rel_diff</span><span class="op">^</span><span class="fl">2</span>,</span>
-<span>      iso_diff <span class="op">=</span></span>
-<span>      <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&gt;=</span> <span class="fl">100</span>, <span class="co"># condition 1</span></span>
-<span>        <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># T 1</span></span>
-<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">100</span>, <span class="co"># condition 2</span></span>
-<span>          <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span>, <span class="co"># T 2</span></span>
-<span>          <span class="cn">NA_real_</span></span>
-<span>        <span class="op">)</span>, <span class="co"># F 2</span></span>
-<span>        <span class="cn">NA_real_</span></span>
-<span>      <span class="op">)</span>, <span class="co"># F1</span></span>
-<span>      iso_range <span class="op">=</span> <span class="co"># # 4.3.16 create iso range variable ----</span></span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">5</span> <span class="op">~</span> <span class="st">"&lt;= 5% or 5 mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">5</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">10</span> <span class="op">~</span> <span class="st">"&gt; 5 - 10% or mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">10</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">15</span> <span class="op">~</span> <span class="st">"&gt; 10 - 15% or mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">15</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 15 - 20% mg/dL"</span>,</span>
-<span>        <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 20% or 20 mg/dL"</span><span class="op">)</span>,</span>
-<span></span>
-<span>      risk_grade <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"A"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.0</span> <span class="op">~</span> <span class="st">"B"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"C"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"D"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"E"</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      risk_grade_txt <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"0 - 0.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.0</span> <span class="op">~</span> <span class="st">"&gt; 0.5 - 1.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"&gt; 1.0 - 2.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"&gt; 2.0 - 3.0"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"&gt; 3.0"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">iso_cols_tbl</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span>  </span>
-<span>  <span class="va">risk_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_iso_cols.html">seg_iso_cols</a></span><span class="op">(</span>risk_cat_cols <span class="op">=</span> <span class="va">risk_cat_cols</span><span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">risk_vars</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
+<p><code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code> combines the SEG risk category and ISO
+range columns into a wrapper function:</p>
 <p>Below I check the differences between <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code>
 and the <code>iso_vars_tbl</code> output:</p>
-</div>
-</div>
-<div class="section level2">
-<h2 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
-</h2>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="section level4">
+<h4 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
+</h4>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span><span class="st">"Test seg_risk_vars()"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span></span>
 <span>    <span class="co"># function table</span></span>
@@ -610,77 +237,51 @@ and the <code>iso_vars_tbl</code> output:</p>
 <span>    expected <span class="op">=</span> <span class="va">iso_vars_tbl</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🥇</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🥳</span></span></code></pre></div>
+</div>
+</div>
 </div>
 <div class="section level2">
-<h2 id="discrepancies-with-risk-grade-table">Discrepancies with Risk Grade table<a class="anchor" aria-label="anchor" href="#discrepancies-with-risk-grade-table"></a>
+<h2 id="update-discrepancies-with-risk-grade-table">Update: discrepancies with <code>Risk Grade</code> table<a class="anchor" aria-label="anchor" href="#update-discrepancies-with-risk-grade-table"></a>
 </h2>
-<p>Due to discrepancies in the application risk grade table, the
-<code>risk_grade</code> and <code>risk_grade_txt</code> variables needed
-to be adjusted in the <code><a href="../reference/seg_iso_cols.html">seg_iso_cols()</a></code> function (see code
+<p>Due to discrepancies in the application risk grade table output, the
+<code>risk_grade</code> and <code>risk_grade_txt</code> variables have
+been adjusted in the <code><a href="../reference/seg_iso_cols.html">seg_iso_cols()</a></code> function (see table
 below):</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>      risk_grade <span class="ot">=</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">0.5</span> <span class="sc">~</span> <span class="st">"A"</span>,</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">1.5</span> <span class="sc">~</span> <span class="st">"B"</span>,</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">1.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">2.5</span> <span class="sc">~</span> <span class="st">"C"</span>,</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">2.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">3.5</span> <span class="sc">~</span> <span class="st">"D"</span>,</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">3.5</span> <span class="sc">~</span> <span class="st">"E"</span></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      ),</span>
-<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>      risk_grade_txt <span class="ot">=</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
-<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">0.5</span> <span class="sc">~</span> <span class="st">"0 - 0.5"</span>,</span>
-<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">1.0</span> <span class="sc">~</span> <span class="st">"&gt; 0.5 - 1.0"</span>,</span>
-<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">1.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">2.0</span> <span class="sc">~</span> <span class="st">"&gt; 1.0 - 2.0"</span>,</span>
-<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">2.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">3.0</span> <span class="sc">~</span> <span class="st">"&gt; 2.0 - 3.0"</span>,</span>
-<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">3.0</span> <span class="sc">~</span> <span class="st">"&gt; 3.0"</span></span>
-<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>      )</span></code></pre></div>
+<p><br></p>
+<div class="figure" style="text-align: center">
+<img src="../reference/figures/2014-risk-zones-paper.png" alt="J Diabetes Sci Technol. 2014 Jul;8(4):658-72. doi: 10.1177/1932296814539589." width="80%"><p class="caption">
+J Diabetes Sci Technol. 2014 Jul;8(4):658-72. doi:
+10.1177/1932296814539589.
+</p>
 </div>
-<div class="section level2">
-<h2 id="updated-seg_risk_vars">Updated <code>seg_risk_vars()</code><a class="anchor" aria-label="anchor" href="#updated-seg_risk_vars"></a>
-</h2>
+<p>The <strong>Risk Factor Range</strong> code has been updated to
+reflect the risk zones in the <a href="https://pubmed.ncbi.nlm.nih.gov/25562886/" class="external-link">Surveillance Error Grid
+paper.</a></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>      risk_grade <span class="ot">=</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">0.5</span> <span class="sc">~</span> <span class="st">"A"</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">1.5</span> <span class="sc">~</span> <span class="st">"B"</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">1.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">2.5</span> <span class="sc">~</span> <span class="st">"C"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">2.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">3.5</span> <span class="sc">~</span> <span class="st">"D"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">3.5</span> <span class="sc">~</span> <span class="st">"E"</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>      ),</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>      risk_grade_txt <span class="ot">=</span> dplyr<span class="sc">::</span><span class="fu">case_when</span>(</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">0.5</span> <span class="sc">~</span> <span class="st">"0 - 0.5"</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">0.5</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">1.0</span> <span class="sc">~</span> <span class="st">"&gt; 0.5 - 1.0"</span>,</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">1.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">2.0</span> <span class="sc">~</span> <span class="st">"&gt; 1.0 - 2.0"</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">2.0</span> <span class="sc">&amp;</span> abs_risk <span class="sc">&lt;</span> <span class="fl">3.0</span> <span class="sc">~</span> <span class="st">"&gt; 2.0 - 3.0"</span>,</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>        abs_risk <span class="sc">&gt;=</span> <span class="fl">3.0</span> <span class="sc">~</span> <span class="st">"&gt; 3.0"</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>      )</span></code></pre></div>
+<div class="section level3">
+<h3 id="updated-seg_iso_cols">Updated <code>seg_iso_cols()</code><a class="anchor" aria-label="anchor" href="#updated-seg_iso_cols"></a>
+</h3>
 <p>I remedy this issue in an updated <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code>
 function below:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_iso_cols</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">risk_cat_vars</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">iso_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_cat_vars</span>,</span>
-<span>      rel_diff <span class="op">=</span> <span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># relative diff</span></span>
-<span>      abs_rel_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">rel_diff</span><span class="op">)</span>, <span class="co"># abs relative diff</span></span>
-<span>      sq_rel_diff <span class="op">=</span> <span class="va">rel_diff</span><span class="op">^</span><span class="fl">2</span>,</span>
-<span>      iso_diff <span class="op">=</span></span>
-<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&gt;=</span> <span class="fl">100</span>, <span class="co"># condition 1</span></span>
-<span>          <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># T 1</span></span>
-<span>          <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">100</span>, <span class="co"># condition 2</span></span>
-<span>            <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span>, <span class="co"># T 2</span></span>
-<span>            <span class="cn">NA_real_</span></span>
-<span>          <span class="op">)</span>, <span class="co"># F 2</span></span>
-<span>          <span class="cn">NA_real_</span></span>
-<span>        <span class="op">)</span>, <span class="co"># F1</span></span>
-<span>      iso_range <span class="op">=</span> <span class="co"># # 4.3.16 create iso range variable ----</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">5</span> <span class="op">~</span> <span class="st">"&lt;= 5% or 5 mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">5</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">10</span> <span class="op">~</span> <span class="st">"&gt; 5 - 10% or mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">10</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">15</span> <span class="op">~</span> <span class="st">"&gt; 10 - 15% or mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">15</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 15 - 20% mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 20% or 20 mg/dL"</span></span>
-<span>        <span class="op">)</span>,</span>
-<span>      risk_grade <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"A"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"B"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"C"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"D"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"E"</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      risk_grade_txt <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"0 - 0.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"&gt; 0.5 - 1.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"&gt; 1.5 - 2.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"&gt; 2.5 - 3.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"&gt; 3.5"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">iso_vars_tbl</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<p>Create a new <code>iso_vars_tbl</code></p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<p><br></p>
+<p>To verify, I’ll use <code><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols()</a></code> and
+<code><a href="../reference/seg_iso_cols.html">seg_iso_cols()</a></code> to create a new
+<code>iso_vars_tbl</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># create risk categories</span></span>
 <span><span class="va">risk_cat_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span></span>
 <span><span class="co"># create ISO columns</span></span>
@@ -707,148 +308,27 @@ function below:</p>
 <span><span class="co">#&gt; $ iso_range      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "&lt;= 5% or 5 mg/dL", "&lt;= 5% or 5 mg/dL", "&lt;= 5% or 5 mg/…</span></span>
 <span><span class="co">#&gt; $ risk_grade     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", …</span></span>
 <span><span class="co">#&gt; $ risk_grade_txt <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", …</span></span></code></pre></div>
-<p>Updated <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code>:</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_risk_vars</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  </span>
-<span>  <span class="va">seg_risk_cat_cols</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">df</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">LookUpRiskCat</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
-<span>      risk_cat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0L</span>, <span class="fl">1L</span>, <span class="fl">2L</span>, <span class="fl">3L</span>, <span class="fl">4L</span>, <span class="fl">5L</span>, <span class="fl">6L</span>, <span class="fl">7L</span><span class="op">)</span>,</span>
-<span>      ABSLB <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.001</span>, <span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">2</span>, <span class="fl">2.5</span>, <span class="fl">3</span>, <span class="fl">3.5</span><span class="op">)</span>,</span>
-<span>      ABSUB <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.5</span>, <span class="fl">1</span>, <span class="fl">1.5</span>, <span class="fl">2</span>, <span class="fl">2.5</span>, <span class="fl">3</span>, <span class="fl">3.5</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span>    <span class="co"># import RiskPairData -----</span></span>
-<span>    <span class="va">RiskPairData</span> <span class="op">&lt;-</span> <span class="fu">segtools</span><span class="fu">::</span><span class="va">RiskPairData</span></span>
-<span></span>
-<span>    <span class="co"># directly manipulate df</span></span>
-<span>    <span class="va">bgm_ref_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">df</span>,</span>
-<span>      BGM <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">BGM</span><span class="op">)</span>,</span>
-<span>      REF <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/double.html" class="external-link">as.double</a></span><span class="op">(</span><span class="va">REF</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span></span>
-<span>    <span class="co"># create bgm_pair_cat ----</span></span>
-<span>    <span class="va">bgm_pair_cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">bgm_ref_tbl</span>,</span>
-<span>      bgm_pair_cat <span class="op">=</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">BGM</span> <span class="op">&lt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &lt; REF"</span>,</span>
-<span>          <span class="va">BGM</span> <span class="op">==</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM = REF"</span>,</span>
-<span>          <span class="va">BGM</span> <span class="op">&gt;</span> <span class="va">REF</span> <span class="op">~</span> <span class="st">"BGM &gt; REF"</span></span>
-<span>        <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="co"># create ref_pair_2cat ----</span></span>
-<span>    <span class="va">ref_pair_2cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">bgm_pair_cat_tbl</span>,</span>
-<span>      ref_pair_2cat <span class="op">=</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &gt; 600: Excluded from SEG Analysis"</span>,</span>
-<span>          <span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">21</span> <span class="op">&amp;</span> <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"REF &lt;21: Included in SEG Analysis"</span></span>
-<span>        <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="co"># create included ----</span></span>
-<span>    <span class="va">included_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">ref_pair_2cat_tbl</span>,</span>
-<span>      included <span class="op">=</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">REF</span> <span class="op">&lt;=</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total included in SEG Analysis"</span>,</span>
-<span>          <span class="va">REF</span> <span class="op">&gt;</span> <span class="fl">600</span> <span class="op">~</span> <span class="st">"Total excluded in SEG Analysis"</span></span>
-<span>        <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="co"># join to RiskPairData ----</span></span>
-<span>    <span class="va">risk_pair_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span><span class="va">included_tbl</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">RiskPairData</span>,</span>
-<span>      by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"BGM"</span>, <span class="st">"REF"</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="co"># Create risk_cat variable ----</span></span>
-<span>    <span class="va">risk_cat_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_pair_tbl</span>,</span>
-<span>      risk_cat <span class="op">=</span></span>
-<span>        <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval</a></span><span class="op">(</span></span>
-<span>          x <span class="op">=</span> <span class="va">abs_risk</span>, <span class="co"># the abs_risk absolute value</span></span>
-<span>          vec <span class="op">=</span> <span class="va">LookUpRiskCat</span><span class="op">$</span><span class="va">ABSLB</span>, <span class="co"># the lower bound absolute risk</span></span>
-<span>          left.open <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>        <span class="op">)</span> <span class="op">-</span> <span class="fl">1</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="co"># Join to LookUpRiskCat data ----</span></span>
-<span>    <span class="va">risk_cat_join_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">inner_join</a></span><span class="op">(</span></span>
-<span>      x <span class="op">=</span> <span class="va">risk_cat_tbl</span>,</span>
-<span>      y <span class="op">=</span> <span class="va">LookUpRiskCat</span>, <span class="co"># inner join to look-up</span></span>
-<span>      by <span class="op">=</span> <span class="st">"risk_cat"</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="co"># create text risk categories ----</span></span>
-<span>    <span class="va">seg_risk_cat_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_cat_join_tbl</span>,</span>
-<span>      risk_cat_txt <span class="op">=</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"None"</span>,</span>
-<span>          <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1</span> <span class="op">~</span> <span class="st">"Slight, Lower"</span>,</span>
-<span>          <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"Slight, Higher"</span>,</span>
-<span>          <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.0</span> <span class="op">~</span> <span class="st">"Moderate, Lower"</span>,</span>
-<span>          <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"Moderate, Higher"</span>,</span>
-<span>          <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.0</span> <span class="op">~</span> <span class="st">"Severe, Lower"</span>,</span>
-<span>          <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Severe, Higher"</span>,</span>
-<span>          <span class="va">abs_risk</span> <span class="op">&gt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"Extreme"</span></span>
-<span>        <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">seg_risk_cat_vars_tbl</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span></span>
-<span>  <span class="va">risk_cat_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_risk_cat_cols.html">seg_risk_cat_cols</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">df</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">seg_iso_cols</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">risk_cat_vars</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">iso_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">risk_cat_vars</span>,</span>
-<span>      rel_diff <span class="op">=</span> <span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># relative diff</span></span>
-<span>      abs_rel_diff <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">rel_diff</span><span class="op">)</span>, <span class="co"># abs relative diff</span></span>
-<span>      sq_rel_diff <span class="op">=</span> <span class="va">rel_diff</span><span class="op">^</span><span class="fl">2</span>,</span>
-<span>      iso_diff <span class="op">=</span></span>
-<span>        <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&gt;=</span> <span class="fl">100</span>, <span class="co"># condition 1</span></span>
-<span>          <span class="fl">100</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span> <span class="op">/</span> <span class="va">REF</span>, <span class="co"># T 1</span></span>
-<span>          <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">REF</span> <span class="op">&lt;</span> <span class="fl">100</span>, <span class="co"># condition 2</span></span>
-<span>            <span class="fu"><a href="https://rdrr.io/r/base/MathFun.html" class="external-link">abs</a></span><span class="op">(</span><span class="va">BGM</span> <span class="op">-</span> <span class="va">REF</span><span class="op">)</span>, <span class="co"># T 2</span></span>
-<span>            <span class="cn">NA_real_</span></span>
-<span>          <span class="op">)</span>, <span class="co"># F 2</span></span>
-<span>          <span class="cn">NA_real_</span></span>
-<span>        <span class="op">)</span>, <span class="co"># F1</span></span>
-<span>      iso_range <span class="op">=</span> <span class="co"># # 4.3.16 create iso range variable ----</span></span>
-<span>        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>          <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">5</span> <span class="op">~</span> <span class="st">"&lt;= 5% or 5 mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">5</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">10</span> <span class="op">~</span> <span class="st">"&gt; 5 - 10% or mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">10</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">15</span> <span class="op">~</span> <span class="st">"&gt; 10 - 15% or mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">15</span> <span class="op">&amp;</span> <span class="va">iso_diff</span> <span class="op">&lt;=</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 15 - 20% mg/dL"</span>,</span>
-<span>          <span class="va">iso_diff</span> <span class="op">&gt;</span> <span class="fl">20</span> <span class="op">~</span> <span class="st">"&gt; 20% or 20 mg/dL"</span></span>
-<span>        <span class="op">)</span>,</span>
-<span>      risk_grade <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"A"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"B"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"C"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"D"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"E"</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      risk_grade_txt <span class="op">=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.0</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">0.5</span> <span class="op">~</span> <span class="st">"0 - 0.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">0.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">1.5</span> <span class="op">~</span> <span class="st">"&gt; 0.5 - 1.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">1.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">2.5</span> <span class="op">~</span> <span class="st">"&gt; 1.5 - 2.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">2.5</span> <span class="op">&amp;</span> <span class="va">abs_risk</span> <span class="op">&lt;</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"&gt; 2.5 - 3.5"</span>,</span>
-<span>        <span class="va">abs_risk</span> <span class="op">&gt;=</span> <span class="fl">3.5</span> <span class="op">~</span> <span class="st">"&gt; 3.5"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">iso_vars_tbl</span><span class="op">)</span></span>
-<span>  <span class="op">}</span></span>
-<span></span>
-<span>  <span class="va">iso_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/seg_iso_cols.html">seg_iso_cols</a></span><span class="op">(</span>risk_cat_vars <span class="op">=</span> <span class="va">risk_cat_vars_tbl</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">iso_vars_tbl</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
 </div>
-<div class="section level2">
-<h2 id="re-test">Re-Test<a class="anchor" aria-label="anchor" href="#re-test"></a>
-</h2>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="updated-seg_risk_vars">Updated <code>seg_risk_vars()</code><a class="anchor" aria-label="anchor" href="#updated-seg_risk_vars"></a>
+</h3>
+<p>Now I can compare this output to the output from the updated
+<code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code> function:</p>
+<div class="section level4">
+<h4 id="re-test">Re-Test<a class="anchor" aria-label="anchor" href="#re-test"></a>
+</h4>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span><span class="st">"Test seg_risk_vars()"</span>, <span class="op">{</span></span>
 <span>  <span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span></span>
-<span>    <span class="co"># function table</span></span>
+<span>    <span class="co"># updated function table</span></span>
 <span>    object <span class="op">=</span> <span class="fu"><a href="../reference/seg_risk_vars.html">seg_risk_vars</a></span><span class="op">(</span>df <span class="op">=</span> <span class="va">test_vand_comp_data</span><span class="op">)</span>, </span>
 <span>    <span class="co"># ISO vars table</span></span>
 <span>    expected <span class="op">=</span> <span class="va">iso_vars_tbl</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🥇</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🎊</span></span></code></pre></div>
+</div>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
     </nav></aside>

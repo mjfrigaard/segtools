@@ -100,12 +100,16 @@
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/sfirke/janitor" class="external-link">janitor</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://waldo.r-lib.org" class="external-link">waldo</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/brodieG/diffobj" class="external-link">diffobj</a></span><span class="op">)</span></span></code></pre></div>
-<p>The risk tables are created using three functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
+<p>The risk tables are created using the functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
 repo. Through the multiple iterations of this application, different
 values have been used to establish these categories.</p>
-<p>This vignette covers the development of the ISO range table function,
-and performs unit tests on the values from the <code>segtools</code>
-functions to match the output in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+<div class="section level3">
+<h3 id="objective">Objective<a class="anchor" aria-label="anchor" href="#objective"></a>
+</h3>
+<p>This vignette covers the ISO range table function and performs unit
+tests on the output table to ensure it matches the table in the output
+in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+</div>
 <div class="section level3">
 <h3 id="load-test-data">Load test data<a class="anchor" aria-label="anchor" href="#load-test-data"></a>
 </h3>
@@ -126,12 +130,12 @@ in the shiny app to generate the tables for comparison.</p>
 <span><span class="co">#&gt; Columns: 2</span></span>
 <span><span class="co">#&gt; $ BGM <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 121, 212, 161, 191, 189, 104, 293, 130, 261, 147, 83, 132, 146, 24…</span></span>
 <span><span class="co">#&gt; $ REF <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 127, 223, 166, 205, 210, 100, 296, 142, 231, 148, 81, 131, 155, 25…</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
-</h2>
+<div class="section level4">
+<h4 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
+</h4>
 <p>Below are the three functions from the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
 file</a> in the application repo.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="seg-risk-variables">SEG Risk Variables<a class="anchor" aria-label="anchor" href="#seg-risk-variables"></a>
@@ -166,56 +170,14 @@ file</a> in the application repo.</p>
 <div class="section level2">
 <h2 id="iso-range-table">ISO Range Table<a class="anchor" aria-label="anchor" href="#iso-range-table"></a>
 </h2>
-<p><a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#LL828C32-L828C46" class="external-link">The
-<code>ISORangeTable5</code> table</a> is also created in the server
-function in the <code>App.R</code> file.</p>
+<p>The <code>ISORangeTable5</code> table is also created in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#LL828C32-L828C46" class="external-link">server
+function</a> in the <code>App.R</code> file.</p>
 <div class="section level3">
 <h3 id="seg_iso_range_tbl">
 <code>seg_iso_range_tbl()</code><a class="anchor" aria-label="anchor" href="#seg_iso_range_tbl"></a>
 </h3>
 <p>I’ve re-written this below as <code><a href="../reference/seg_iso_range_tbl.html">seg_iso_range_tbl()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">seg_iso_range_tbl</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">risk_vars</span><span class="op">)</span> <span class="op">{</span></span>
-<span></span>
-<span>  <span class="va">lkpISORanges</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
-<span>       <span class="op">~</span><span class="va">ID</span>,                <span class="op">~</span><span class="va">iso_range</span>,</span>
-<span>        <span class="fl">1L</span>,    <span class="st">"&lt;= 5% or 5 mg/dL"</span>,</span>
-<span>        <span class="fl">2L</span>,  <span class="st">"&gt; 5 - 10% or mg/dL"</span>,</span>
-<span>        <span class="fl">3L</span>, <span class="st">"&gt; 10 - 15% or mg/dL"</span>,</span>
-<span>        <span class="fl">4L</span>,    <span class="st">"&gt; 15 - 20% mg/dL"</span>,</span>
-<span>        <span class="fl">5L</span>,   <span class="st">"&gt; 20% or 20 mg/dL"</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">iso_range_cnts</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">risk_vars</span>,</span>
-<span>    <span class="va">iso_range</span>,</span>
-<span>    sort <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">iso_range_joined</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">full_join</a></span><span class="op">(</span></span>
-<span>    x <span class="op">=</span> <span class="va">iso_range_cnts</span>,</span>
-<span>    y <span class="op">=</span> <span class="va">lkpISORanges</span>,</span>
-<span>    by <span class="op">=</span> <span class="st">"iso_range"</span></span>
-<span>  <span class="op">)</span></span>
-<span>    <span class="va">iso_range_vars</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span><span class="va">iso_range_joined</span>,</span>
-<span>    Percent <span class="op">=</span> <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span></span>
-<span>      <span class="fu">base</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="va">n</span> <span class="op">/</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">risk_vars</span><span class="op">)</span> <span class="op">*</span> <span class="fl">100</span>,</span>
-<span>        digits <span class="op">=</span> <span class="fl">1</span></span>
-<span>      <span class="op">)</span>,</span>
-<span>      <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span>condition <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span>,</span>
-<span>        true <span class="op">=</span> <span class="st">""</span>,</span>
-<span>        false <span class="op">=</span> <span class="st">"%"</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">n</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span>  <span class="va">iso_range_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">iso_range_vars</span>, <span class="va">ID</span>,</span>
-<span>    `ISO range` <span class="op">=</span> <span class="va">iso_range</span>,</span>
-<span>    N <span class="op">=</span> <span class="va">n</span>,</span>
-<span>    <span class="va">Percent</span></span>
-<span>  <span class="op">)</span></span>
-<span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">iso_range_vars_tbl</span><span class="op">)</span></span>
-<span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_iso_range_tbl.html">seg_iso_range_tbl</a></span><span class="op">(</span><span class="va">risk_vars_tbl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
 <span><span class="co">#&gt;      ID `ISO range`             N Percent</span></span>
@@ -225,14 +187,15 @@ function in the <code>App.R</code> file.</p>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span>     3 &gt; 10 - 15% or mg/dL  <span style="text-decoration: underline;">1</span>050 10.6%  </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span>     4 &gt; 15 - 20% mg/dL      340 3.4%   </span></span>
 <span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span>     5 &gt; 20% or 20 mg/dL     308 3.1%</span></span></code></pre></div>
-<div class="section level5">
-<h5 id="application-isorangetable">Application <code>ISORangeTable</code><a class="anchor" aria-label="anchor" href="#application-isorangetable"></a>
-</h5>
+</div>
+<div class="section level3">
+<h3 id="application-isorangetable">Application <code>ISORangeTable</code><a class="anchor" aria-label="anchor" href="#application-isorangetable"></a>
+</h3>
 <p>Below is the output for the <code>ISORangeTable</code> in the
 application</p>
 <p><img src="../reference/figures/vand_comp_iso_range.png" width="100%"></p>
 <p>I’ve re-created this as <code>app_iso_range_tbl</code> below:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_iso_range_tbl</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
 <span>     <span class="op">~</span><span class="va">ID</span>,          <span class="op">~</span><span class="va">`ISO range`</span>,    <span class="op">~</span><span class="va">N</span>, <span class="op">~</span><span class="va">Percent</span>,</span>
 <span>      <span class="fl">1L</span>,    <span class="st">"&lt;= 5% or 5 mg/dL"</span>, <span class="fl">5328L</span>,    <span class="st">"54%"</span>,</span>
@@ -282,12 +245,11 @@ application</p>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section level5">
-<h5 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
-</h5>
+<div class="section level4">
+<h4 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
+</h4>
 <p>Below we test the two <code>ISORangeTable</code> tables</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span><span class="st">"Test risk grade table"</span>, <span class="op">{</span></span>
 <span><span class="fu">testthat</span><span class="fu">::</span><span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span></span>
 <span>  <span class="co"># function table</span></span>
@@ -296,7 +258,7 @@ application</p>
 <span>  expected <span class="op">=</span> <span class="va">app_iso_range_tbl</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🥇</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 🌈</span></span></code></pre></div>
 </div>
 </div>
 </div>

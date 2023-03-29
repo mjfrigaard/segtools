@@ -103,9 +103,13 @@
 <p>The risk tables are created using three functions in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/tree/master" class="external-link">seg-shiny-1-3-3</a>
 repo. Through the multiple iterations of this application, different
 values have been used to establish these categories.</p>
-<p>This vignette covers the development of the MARD table function, and
-performs unit tests on the values from the <code>segtools</code>
-functions to match the output in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+<div class="section level3">
+<h3 id="objective">Objective<a class="anchor" aria-label="anchor" href="#objective"></a>
+</h3>
+<p>This vignette covers the MARD table function, and performs unit tests
+on the output from the <code><a href="../reference/seg_mard_tbl.html">seg_mard_tbl()</a></code> function to ensure
+they match the table output in the <a href="https://www.diabetestechnology.org/seg/" class="external-link">application</a>.</p>
+</div>
 <div class="section level3">
 <h3 id="load-test-data">Load test data<a class="anchor" aria-label="anchor" href="#load-test-data"></a>
 </h3>
@@ -126,12 +130,12 @@ in the shiny app to generate the tables for comparison.</p>
 <span><span class="co">#&gt; Columns: 2</span></span>
 <span><span class="co">#&gt; $ BGM <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 121, 212, 161, 191, 189, 104, 293, 130, 261, 147, 83, 132, 146, 24…</span></span>
 <span><span class="co">#&gt; $ REF <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> 127, 223, 166, 205, 210, 100, 296, 142, 231, 148, 81, 131, 155, 25…</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
+</h4>
+<p>The previous application functions are stored in the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
+file</a> in the GitHub repo.</p>
 </div>
-<div class="section level2">
-<h2 id="application-version-1-3-3-functions">Application (version 1.3.3) functions<a class="anchor" aria-label="anchor" href="#application-version-1-3-3-functions"></a>
-</h2>
-<p>Below are the three functions from the <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/master/App/helpers.R" class="external-link"><code>helpers.R</code>
-file</a> in the application repo.</p>
 </div>
 <div class="section level2">
 <h2 id="seg-risk-variables">SEG Risk Variables<a class="anchor" aria-label="anchor" href="#seg-risk-variables"></a>
@@ -162,17 +166,18 @@ file</a> in the application repo.</p>
 <span><span class="co">#&gt; $ iso_range      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "&lt;= 5% or 5 mg/dL", "&lt;= 5% or 5 mg/dL", "&lt;= 5% or 5 mg/…</span></span>
 <span><span class="co">#&gt; $ risk_grade     <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", "A", …</span></span>
 <span><span class="co">#&gt; $ risk_grade_txt <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", "0 - 0.5", …</span></span></code></pre></div>
-<div class="section level3">
-<h3 id="mard-table">MARD Table<a class="anchor" aria-label="anchor" href="#mard-table"></a>
-</h3>
+</div>
+<div class="section level2">
+<h2 id="mard-table">MARD Table<a class="anchor" aria-label="anchor" href="#mard-table"></a>
+</h2>
 <p>The <code>MARDTable</code> is created in the server function of the
 application, starting <a href="https://github.com/quesgen/seg-shiny-1-3-3/blob/4582582ee56547e4f03c4a683c8958f74c9f2f07/App/App.R#L669" class="external-link">here</a>.</p>
 <p>I’ve converted it into a function, <code><a href="../reference/seg_mard_tbl.html">seg_mard_tbl()</a></code>, which
 takes the output from <code><a href="../reference/seg_risk_vars.html">seg_risk_vars()</a></code>:</p>
-<div class="section level4">
-<h4 id="seg_mard_tbl">
+<div class="section level3">
+<h3 id="seg_mard_tbl">
 <code>seg_mard_tbl()</code><a class="anchor" aria-label="anchor" href="#seg_mard_tbl"></a>
-</h4>
+</h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">seg_mard_tbl</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">risk_vars</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="va">mard_cols</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -218,7 +223,7 @@ takes the output from <code><a href="../reference/seg_risk_vars.html">seg_risk_v
 <span>  <span class="va">mard_vars_tbl</span> <span class="op">&lt;-</span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/as_tibble.html" class="external-link">as_tibble</a></span><span class="op">(</span><span class="va">mard_vars</span><span class="op">)</span></span>
 <span>  <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">mard_vars_tbl</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>Below I test the <code><a href="../reference/seg_mard_tbl.html">seg_mard_tbl()</a></code> function</p>
+<p>Below I check the <code><a href="../reference/seg_mard_tbl.html">seg_mard_tbl()</a></code> function:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/seg_mard_tbl.html">seg_mard_tbl</a></span><span class="op">(</span>risk_vars <span class="op">=</span> <span class="va">risk_vars_tbl</span><span class="op">)</span></span></code></pre></div>
 <table class="table">
@@ -248,9 +253,9 @@ takes the output from <code><a href="../reference/seg_risk_vars.html">seg_risk_v
 </tr></tbody>
 </table>
 </div>
-<div class="section level4">
-<h4 id="application-mardtable">Application <code>MARDTable</code><a class="anchor" aria-label="anchor" href="#application-mardtable"></a>
-</h4>
+<div class="section level3">
+<h3 id="application-mardtable">Application <code>MARDTable</code><a class="anchor" aria-label="anchor" href="#application-mardtable"></a>
+</h3>
 <p>The MARD table from the application is below:</p>
 <p><img src="../reference/figures/vand_comp_mard.png" width="100%" style="display: block; margin: auto;"></p>
 <p>Once again, I will store the app’s MARD table into and object I can
@@ -291,11 +296,9 @@ test using <code>datapasta::tribble_paste()</code> (as
 <td align="left">29.6%</td>
 </tr></tbody>
 </table>
-</div>
-</div>
-<div class="section level3">
-<h3 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
-</h3>
+<div class="section level4">
+<h4 id="test">Test<a class="anchor" aria-label="anchor" href="#test"></a>
+</h4>
 <p>Below I test both MARD tables using
 <code><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">testthat::expect_equal()</a></code> again:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
@@ -307,7 +310,8 @@ test using <code>datapasta::tribble_paste()</code> (as
 <span>  expected <span class="op">=</span> <span class="va">app_mard_tbl</span></span>
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span><span class="op">)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 😸</span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BB00;">Test passed</span> 😀</span></span></code></pre></div>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
