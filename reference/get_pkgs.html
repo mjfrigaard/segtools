@@ -10,7 +10,7 @@
     
     <a class="navbar-brand me-2" href="../index.html">segtools</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.1</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.1.2</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -42,6 +42,8 @@
     <h6 class="dropdown-header" data-toc-skip>Graphs</h6>
     <a class="dropdown-item" href="../articles/seg-graph.html">Surveillance Error Grid</a>
     <a class="dropdown-item" href="../articles/modba.html">Modified Bland-Altman Plot</a>
+    <a class="dropdown-item" href="../articles/heatmap.html">ggplot2 heat-map</a>
+    <a class="dropdown-item" href="../articles/hexsticker.html">Package hex sticker</a>
   </div>
 </li>
 <li class="nav-item">
@@ -86,23 +88,25 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> "cli", "colorspace", "cpp11", "crayon", "curl", "desc", "diffobj", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "digest", "downlit", "dplyr", "ellipsis", "evaluate", "extrafont", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "extrafontdb", "fansi", "farver", "fastmap", "fontawesome", "fs", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "generics", "ggforce", "ggplot2", "glue", "gtable", "highr", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "generics", "ggforce", "ggfun", "ggimage", "ggplot2", "ggplotify", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "glue", "gridGraphics", "gtable", "hexSticker", "hexbin", "highr", </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> "hms", "htmltools", "httr", "isoband", "janitor", "jquerylib", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "jsonlite", "knitr", "labeling", "lifecycle", "lubridate", "magrittr", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "memoise", "mime", "munsell", "openssl", "pak", "pillar", "pkgconfig", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "pkgdown", "pkgload", "png", "polyclip", "praise", "prettyunits", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "processx", "progress", "ps", "purrr", "ragg", "rappdirs", "rematch2", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "renv", "rlang", "rmarkdown", "rprojroot", "sass", "scales", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "segtools", "sessioninfo", "showtext", "showtextdb", "snakecase", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "stringi", "stringr", "sys", "sysfonts", "systemfonts", "testthat", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "textshaping", "tibble", "tidyr", "tidyselect", "timechange", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "tinytex", "tweenr", "tzdb", "utf8", "vctrs", "viridisLite", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "vroom", "waldo", "whisker", "withr", "xfun", "xml2", "yaml", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "KernSmooth", "MASS", "Matrix", "base", "boot", "class", "cluster", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "codetools", "compiler", "datasets", "foreign", "grDevices", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "graphics", "grid", "lattice", "methods", "mgcv", "nlme", "nnet", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "parallel", "rpart", "spatial", "splines", "stats", "stats4", </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> "survival", "tcltk", "tools", "utils")</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "jsonlite", "knitr", "labeling", "lifecycle", "lubridate", "magick", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "magrittr", "memoise", "mime", "munsell", "openssl", "pak", "patchwork", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "pillar", "pkgconfig", "pkgdown", "pkgload", "png", "polyclip", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "praise", "prettyunits", "processx", "progress", "ps", "purrr", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "ragg", "rappdirs", "rematch2", "renv", "rlang", "rmarkdown", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "rprojroot", "sass", "scales", "segtools", "sessioninfo", "showtext", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "showtextdb", "snakecase", "stringi", "stringr", "sys", "sysfonts", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "systemfonts", "testthat", "textshaping", "tibble", "tidyr", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "tidyselect", "timechange", "tinytex", "tweenr", "tzdb", "utf8", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "vctrs", "viridisLite", "vroom", "waldo", "whisker", "withr", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "xfun", "xml2", "yaml", "yulab.utils", "KernSmooth", "MASS", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "Matrix", "base", "boot", "class", "cluster", "codetools", "compiler", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "datasets", "foreign", "grDevices", "graphics", "grid", "lattice", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "methods", "mgcv", "nlme", "nnet", "parallel", "rpart", "spatial", </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> "splines", "stats", "stats4", "survival", "tcltk", "tools", "utils"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> )</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
