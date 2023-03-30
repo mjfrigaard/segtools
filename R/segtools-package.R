@@ -21,5 +21,6 @@
 #' @import ggplot2
 #' @import patchwork
 #' @import magick
+#' @import hexSticker
 #'
 NULL
