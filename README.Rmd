@@ -45,7 +45,7 @@ showtext::showtext_auto()
 
 <br>
 
-```{r package_hex, echo=FALSE, out.width='20%', fig.align='left'}
+```{r package_hex, echo=FALSE, out.width='20%', fig.align='right'}
 knitr::include_graphics("man/figures/package_hex.png")
 ```
 

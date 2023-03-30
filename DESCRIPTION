@@ -1,6 +1,6 @@
 Package: segtools
 Title: The surveillance error grid tools
-Version: 1.1.1
+Version: 1.1.2
 Authors@R: person('Martin', 'Frigaard', email = 'mjfrigaard@pm.me', role = c('cre', 'aut'))
 License: MIT + file LICENSE
 Maintainer: Martin Frigaard <mjfrigaard@pm.me>
@@ -14,6 +14,7 @@ Imports:
     ggplot2,
     ggforce,
     patchwork,
+    magick,
     janitor,
     png,
     purrr,

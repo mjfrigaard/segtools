@@ -661,13 +661,14 @@
     "hexSticker": {
       "Package": "hexSticker",
       "Version": "0.4.9",
-      "Source": "GitHub",
-      "RemoteType": "github",
-      "RemoteHost": "api.github.com",
-      "RemoteRepo": "hexSticker",
-      "RemoteUsername": "GuangchuangYu",
-      "RemoteRef": "HEAD",
-      "RemoteSha": "89d0fed1b21c197828b593e021d8fbefac166f1a",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "RemoteType": "standard",
+      "RemotePkgRef": "hexSticker",
+      "RemoteRef": "hexSticker",
+      "RemoteRepos": "https://cran.rstudio.com",
+      "RemotePkgPlatform": "x86_64-apple-darwin17.0",
+      "RemoteSha": "0.4.9",
       "Requirements": [
         "R",
         "ggimage",
@@ -678,7 +679,7 @@
         "stats",
         "sysfonts"
       ],
-      "Hash": "3268572d09b21681adecd2a82887d8fc"
+      "Hash": "c624f6eb9e15082a672b5e6277257567"
     },
     "hexbin": {
       "Package": "hexbin",

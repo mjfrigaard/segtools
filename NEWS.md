@@ -1,3 +1,8 @@
+# segtools 1.1.2
+
+* New vignette for `ggplot2` SEG graph (not used in application)
+
+* New vignette for hex sticker (using `patchwork`, `hexSticker` and `magick`)
 
 # segtools 1.1.1
 

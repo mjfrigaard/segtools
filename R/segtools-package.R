@@ -15,8 +15,11 @@
 #'
 #' @importFrom tibble tibble tribble add_row add_column
 #'
+#' @importFrom hexSticker sticker
+#'
 #'
 #' @import ggplot2
 #' @import patchwork
+#' @import magick
 #'
 NULL

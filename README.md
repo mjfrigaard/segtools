@@ -3,7 +3,7 @@
 
 <br>
 
-<img src="man/figures/package_hex.png" width="20%" style="display: block; margin: auto auto auto 0;" />
+<img src="man/figures/package_hex.png" width="20%" style="display: block; margin: auto 0 auto auto;" />
 
 <br>
 
