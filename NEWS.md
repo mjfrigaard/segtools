@@ -4,6 +4,8 @@
 
 * New vignette for hex sticker (using `patchwork`, `hexSticker` and `magick`)
 
+* Updated README with reference 
+
 # segtools 1.1.1
 
 * New tests for `import_flat_file()`
