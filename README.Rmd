@@ -54,10 +54,15 @@ knitr::include_graphics("man/figures/package_hex.png")
 # segtools
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
+`segtools` provides the underlying functions and calculations for [The Surveillance Error Grid](https://www.diabetestechnology.org/seg.shtml) shiny application. 
 
-`segtools` provides the underlying functions and calculations for [The Surveillance Error Grid](https://www.diabetestechnology.org/seg.shtml) shiny application.
+For more information, see the original paper:
+
+Klonoff, David C., Courtney Lias, Robert Vigersky, William Clarke, Joan Lee Parkes, David B. Sacks, M. Sue Kirkman, et al. 2014. "*The Surveillance Error Grid.*" Journal of Diabetes Science and Technology 8 (4): 658–72. [https://doi.org/10.1177/1932296814539589](https://doi.org/10.1177/1932296814539589)
+
 
 ## Installation
 
@@ -72,9 +77,9 @@ remotes::install_github("mjfrigaard/segtools")
 
 The previous shiny applications are stored in the [Quesgen GitHub repositories](https://github.com/quesgen):
 
-* [Version 1.3.2](https://github.com/quesgen/seg-shiny-1-3-2)
+-   [Version 1.3.2](https://github.com/quesgen/seg-shiny-1-3-2)
 
-* [Version 1.3.3](https://github.com/quesgen/seg-shiny-1-3-3)
+-   [Version 1.3.3](https://github.com/quesgen/seg-shiny-1-3-3)
 
 ## SEG Graph
 

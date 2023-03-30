@@ -16,6 +16,13 @@
 Surveillance Error Grid](https://www.diabetestechnology.org/seg.shtml)
 shiny application.
 
+For more information, see the original paper:
+
+Klonoff, David C., Courtney Lias, Robert Vigersky, William Clarke, Joan
+Lee Parkes, David B. Sacks, M. Sue Kirkman, et al. 2014. “*The
+Surveillance Error Grid.*” Journal of Diabetes Science and Technology 8
+(4): 658–72. <https://doi.org/10.1177/1932296814539589>
+
 ## Installation
 
 You can install the development version of `segtools` from
